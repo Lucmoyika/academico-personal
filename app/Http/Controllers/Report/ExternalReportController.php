@@ -12,12 +12,13 @@ use App\Services\StatService;
 use App\Traits\PeriodSelection;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ExternalReportController extends Controller
 {
     use PeriodSelection;
 
-    public function external2(Request $request)
+    public function external2(Request $request): View
     {
         $data = [];
         $report_start_date = Carbon::parse($request->report_start_date) ?? Carbon::parse('2019-01-01');
@@ -39,7 +40,7 @@ class ExternalReportController extends Controller
         ]);
     }
 
-    public function external(Request $request)
+    public function external(Request $request): View
     {
         $data = [];
         $year_data = [];
@@ -109,14 +110,14 @@ class ExternalReportController extends Controller
         ]);
     }
 
-    public function external3()
+    public function external3(): View
     {
         return view('reports.external3', [
             'partners' => Partner::all(),
         ]);
     }
 
-    public function partner(Partner $partner, Request $request)
+    public function partner(Partner $partner, Request $request): View
     {
         $data = [];
         $report_start_date = Carbon::parse($request->report_start_date) ?? Carbon::parse('2019-01-01');

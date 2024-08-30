@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Operations;
 use App\Models\Course;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 
 trait ShowStudentListOperation
 {
@@ -15,7 +16,7 @@ trait ShowStudentListOperation
      * @param  string  $routeName  Prefix of the route name.
      * @param  string  $controller Name of the current CrudController.
      */
-    protected function setupShowStudentListRoutes($segment, $routeName, $controller)
+    protected function setupShowStudentListRoutes(string $segment, string $routeName, string $controller)
     {
         Route::get($segment.'/{id}/show', [
             'as' => $routeName.'.showstudentlist',
@@ -44,7 +45,7 @@ trait ShowStudentListOperation
     /**
      * Show the view for performing the operation.
      */
-    public function showstudentlist($id)
+    public function showstudentlist($id): View
     {
         $course = Course::findOrFail($id);
         // The current is not allowed to view the page

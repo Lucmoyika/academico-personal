@@ -7,6 +7,7 @@ use App\Models\Enrollment;
 use App\Models\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class GradeController extends Controller
 {
@@ -15,7 +16,7 @@ class GradeController extends Controller
      *
      * Todo refactor to prevent the number of queries to depend upon the number of records
      */
-    public function edit(Course $course)
+    public function edit(Course $course): View
     {
         $this->checkAccessForCourse($course);
 

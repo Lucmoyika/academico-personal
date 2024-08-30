@@ -7,6 +7,8 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\App;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -46,17 +48,17 @@ class ScheduledPayment extends Model
         $this->save();
     }
 
-    public function enrollment()
+    public function enrollment(): BelongsTo
     {
         return $this->belongsTo(Enrollment::class);
     }
 
-    public function statusType()
+    public function statusType(): BelongsTo
     {
         return $this->belongsTo(EnrollmentStatusType::class, 'status');
     }
 
-    public function invoiceDetails()
+    public function invoiceDetails(): MorphMany
     {
         return $this->morphMany(InvoiceDetail::class, 'product');
     }

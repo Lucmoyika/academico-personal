@@ -26,10 +26,8 @@ class WatchAttendance implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->attendance->attendance_type_id == 4) {
             // if so, send an email

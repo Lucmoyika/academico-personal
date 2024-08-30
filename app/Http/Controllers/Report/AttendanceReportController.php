@@ -10,12 +10,13 @@ use App\Models\Period;
 use App\Models\Rhythm;
 use App\Traits\PeriodSelection;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AttendanceReportController extends Controller
 {
     use PeriodSelection;
 
-    public function forCourse(Request $request)
+    public function forCourse(Request $request): View
     {
         $period = $this->selectPeriod($request);
 
@@ -63,7 +64,7 @@ class AttendanceReportController extends Controller
         ]);
     }
 
-    public function byCourse(Request $request)
+    public function byCourse(Request $request): View
     {
         $period = $this->selectPeriod($request);
 
@@ -97,7 +98,7 @@ class AttendanceReportController extends Controller
         ]);
     }
 
-    public function byLevel(Request $request)
+    public function byLevel(Request $request): View
     {
         $year = $this->selectYear($request);
         if ($year) {
@@ -151,7 +152,7 @@ class AttendanceReportController extends Controller
         ]);
     }
 
-    public function byRhythm(Request $request)
+    public function byRhythm(Request $request): View
     {
         $year = $this->selectYear($request);
         if ($year) {

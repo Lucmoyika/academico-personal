@@ -13,6 +13,7 @@ use App\Traits\PeriodSelection;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class ReportController extends Controller
 {
@@ -116,7 +117,7 @@ class ReportController extends Controller
     /**
      * Show the enrollment numbers per rhythm.
      */
-    public function rhythms(Request $request)
+    public function rhythms(Request $request): View
     {
         $year = $this->selectYear($request);
         if ($year) {
@@ -142,7 +143,7 @@ class ReportController extends Controller
     }
 
     /** Number of students per course */
-    public function courses(Request $request)
+    public function courses(Request $request): View
     {
         $period = $this->selectPeriod($request);
 
@@ -158,7 +159,7 @@ class ReportController extends Controller
     }
 
     /** Number of students per level */
-    public function levels(Request $request)
+    public function levels(Request $request): View
     {
         $year = $this->selectYear($request);
         if ($year) {

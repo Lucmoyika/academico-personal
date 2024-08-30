@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
@@ -39,7 +41,7 @@ class Teacher extends Model
     }
 
     /** relations */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id', 'id')->withTrashed();
     }
@@ -61,12 +63,12 @@ class Teacher extends Model
             ->where('end', '<=', Carbon::parse($period->end)->setTime(23, 59, 0)->toDateTimeString());
     }
 
-    public function events()
+    public function events(): HasMany
     {
         return $this->hasMany(Event::class);
     }
 
-    public function leaves()
+    public function leaves(): HasMany
     {
         return $this->hasMany(Leave::class)->with('leaveType');
     }
@@ -82,7 +84,6 @@ class Teacher extends Model
 
         // loop through all leave dates
         for ($i = 0; $i < (is_countable($dates) ? count($dates) : 0); $i++) {
-
             // if the next date does not touch current range
             if (isset($dates[$i + 1])) {
                 if (Carbon::parse($dates[$i]['date'])->addDay() != Carbon::parse($dates[$i + 1]['date'])) {
@@ -110,7 +111,7 @@ class Teacher extends Model
         return $formatted_leaves;
     }
 
-    public function courses()
+    public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
     }
@@ -173,7 +174,6 @@ class Teacher extends Model
 
         foreach ($eventsWithExpectedAttendance as $event) {
             foreach ($event->enrollments as $enrollment) {
-
                 // if a student has no attendance record for the class (event)
                 $hasNotAttended = $event->attendance->where('student_id', $enrollment->student_id)->isEmpty();
 

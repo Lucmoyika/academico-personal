@@ -5,6 +5,8 @@ namespace App\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prologue\Alerts\Facades\Alert;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -57,7 +59,7 @@ class Event extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function course()
+    public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class)->withCount('enrollments');
     }
@@ -67,17 +69,17 @@ class Event extends Model
         return $this->course->enrollments();
     }
 
-    public function attendance()
+    public function attendance(): HasMany
     {
         return $this->hasMany(Attendance::class);
     }
 
-    public function teacher()
+    public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class)->withTrashed();
     }
 
-    public function room()
+    public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class)->withTrashed();
     }

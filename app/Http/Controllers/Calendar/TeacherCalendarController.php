@@ -8,6 +8,7 @@ use App\Models\Leave;
 use App\Models\Teacher;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class TeacherCalendarController extends Controller
 {
@@ -20,7 +21,7 @@ class TeacherCalendarController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         // Do not fetch all events but only those closest to current date.
         $events = Event::with('course')
@@ -75,7 +76,7 @@ class TeacherCalendarController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Teacher $teacher)
+    public function show(Teacher $teacher): View
     {
         // If the user is not allowed to perform this action
         if (Gate::forUser(backpack_user())->denies('view-teacher-calendar', $teacher)) {

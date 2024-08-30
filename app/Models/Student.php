@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
@@ -115,12 +118,12 @@ class Student extends Model implements HasMedia
         return $this->belongsTo(User::class, 'id', 'id');
     }
 
-    public function attendance()
+    public function attendance(): HasMany
     {
         return $this->hasMany(Attendance::class);
     }
 
-    public function periodAbsences(Period $period = null)
+    public function periodAbsences(Period $period = null): HasMany
     {
         if ($period == null) {
             $period = Period::get_default_period();
@@ -131,7 +134,7 @@ class Student extends Model implements HasMedia
         ->whereHas('event', fn ($q) => $q->whereHas('course', fn ($c) => $c->where('period_id', $period->id)));
     }
 
-    public function periodAttendance(Period $period = null)
+    public function periodAttendance(Period $period = null): HasMany
     {
         if ($period == null) {
             $period = Period::get_default_period();
@@ -141,44 +144,44 @@ class Student extends Model implements HasMedia
         ->whereHas('event', fn ($q) => $q->whereHas('course', fn ($c) => $c->where('period_id', $period->id)));
     }
 
-    public function contacts()
+    public function contacts(): HasMany
     {
         return $this->hasMany(Contact::class, 'student_id');
     }
 
-    public function comments()
+    public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
 
-    public function phone()
+    public function phone(): MorphMany
     {
         return $this->morphMany(PhoneNumber::class, 'phoneable');
     }
 
-    public function enrollments()
+    public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class)
             ->with('course')
             ->orderByDesc('created_at');
     }
 
-    public function leadType()
+    public function leadType(): BelongsTo
     {
         return $this->belongsTo(LeadType::class);
     }
 
-    public function institution()
+    public function institution(): BelongsTo
     {
         return $this->belongsTo(Institution::class);
     }
 
-    public function profession()
+    public function profession(): BelongsTo
     {
         return $this->belongsTo(Profession::class);
     }
 
-    public function books()
+    public function books(): BelongsToMany
     {
         return $this->belongsToMany(Book::class)->withPivot('id', 'code', 'status_id', 'expiry_date');
     }

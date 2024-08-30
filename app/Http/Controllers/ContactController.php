@@ -6,7 +6,9 @@ use App\Http\Requests\ContactRequest as StoreRequest;
 use App\Models\Contact;
 use App\Models\PhoneNumber;
 use App\Models\Profession;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Prologue\Alerts\Facades\Alert;
 
 class ContactController extends Controller
@@ -20,7 +22,7 @@ class ContactController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request): RedirectResponse
     {
         $request->validate([
             'firstname' => 'required',
@@ -56,7 +58,7 @@ class ContactController extends Controller
         return redirect()->back();
     }
 
-    public function update(Contact $contact, Request $request)
+    public function update(Contact $contact, Request $request): RedirectResponse
     {
         // check if the user is allowed to edit the contact
         if (! backpack_user()->can('update', $contact)) {
@@ -94,7 +96,7 @@ class ContactController extends Controller
     }
 
     // open a page to update contact information
-    public function edit(Contact $contact)
+    public function edit(Contact $contact): View
     {
         // check if the user is allowed to edit the contact
         if (! backpack_user()->can('update', $contact)) {

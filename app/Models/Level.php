@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Skills\Skill;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Level extends Model
@@ -16,7 +17,7 @@ class Level extends Model
 
     protected $guarded = ['id'];
 
-    public function skill()
+    public function skill(): HasMany
     {
         return $this->hasMany(Skill::class);
     }

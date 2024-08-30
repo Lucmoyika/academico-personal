@@ -13,6 +13,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\App;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -165,22 +170,22 @@ class Enrollment extends Model implements InvoiceableModel
     |--------------------------------------------------------------------------
     */
 
-    public function student()
+    public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'student_id');
     }
 
-    public function course()
+    public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class, 'course_id');
     }
 
-    public function invoiceDetails()
+    public function invoiceDetails(): MorphMany
     {
         return $this->morphMany(InvoiceDetail::class, 'product');
     }
@@ -198,39 +203,39 @@ class Enrollment extends Model implements InvoiceableModel
         return $this->invoices()->concat($scheduledPaymentsInvoices)->flatten(1);
     }
 
-    public function comments()
+    public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
 
-    public function scholarships()
+    public function scholarships(): BelongsToMany
     {
         return $this->belongsToMany(Scholarship::class);
     }
 
-    public function result()
+    public function result(): HasOne
     {
         return $this->hasOne(Result::class)
             ->with('result_name')
             ->with('comments');
     }
 
-    public function childrenEnrollments()
+    public function childrenEnrollments(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id');
     }
 
-    public function enrollmentStatus()
+    public function enrollmentStatus(): BelongsTo
     {
         return $this->belongsTo(EnrollmentStatusType::class, 'status_id');
     }
 
-    public function grades()
+    public function grades(): HasMany
     {
         return $this->hasMany(Grade::class);
     }
 
-    public function scheduledPayments()
+    public function scheduledPayments(): HasMany
     {
         return $this->hasMany(ScheduledPayment::class);
     }
@@ -262,7 +267,7 @@ class Enrollment extends Model implements InvoiceableModel
         return $this->result->result_name->name ?? '-';
     }
 
-    public function skillEvaluations()
+    public function skillEvaluations(): HasMany
     {
         return $this->hasMany(SkillEvaluation::class);
     }

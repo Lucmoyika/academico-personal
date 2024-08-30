@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Year extends Model
 {
@@ -13,7 +14,7 @@ class Year extends Model
 
     protected $guarded = ['id'];
 
-    public function periods()
+    public function periods(): HasMany
     {
         return $this->hasMany(Period::class);
     }

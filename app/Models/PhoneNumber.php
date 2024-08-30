@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -26,7 +27,7 @@ class PhoneNumber extends Model
         return $this->phone_number;
     }
 
-    public function phoneable()
+    public function phoneable(): MorphTo
     {
         return $this->morphTo();
     }

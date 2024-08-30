@@ -8,7 +8,9 @@ use App\Models\Period;
 use App\Models\Rhythm;
 use App\Models\Student;
 use App\Traits\FiltersSearchableLevels;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -23,7 +25,7 @@ class CourseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $defaultPeriod = Period::get_default_period();
         $rhythms = Rhythm::all();
@@ -65,7 +67,7 @@ class CourseController extends Controller
         };
     }
 
-    public function switchViews(Request $request)
+    public function switchViews(Request $request): RedirectResponse
     {
         switch ($request->view) {
             case 'blocks':

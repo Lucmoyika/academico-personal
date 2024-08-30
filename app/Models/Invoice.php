@@ -6,6 +6,9 @@ use App\Events\InvoiceDeleting;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -31,22 +34,22 @@ class Invoice extends Model
         return LogOptions::defaults()->logUnguarded();
     }
 
-    public function invoiceDetails()
+    public function invoiceDetails(): HasMany
     {
         return $this->hasMany(InvoiceDetail::class)->orderByRaw("CASE WHEN product_type like '%Enrollment' THEN 10 WHEN product_type like '%Fee' THEN 5 ELSE 0 END desc");
     }
 
-    public function taxes()
+    public function taxes(): HasMany
     {
         return $this->hasMany(InvoiceDetail::class)->where('product_type', Tax::class);
     }
 
-    public function scheduledPayments()
+    public function scheduledPayments(): HasMany
     {
         return $this->hasMany(InvoiceDetail::class)->where('product_type', ScheduledPayment::class);
     }
 
-    public function payments()
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
@@ -56,17 +59,17 @@ class Invoice extends Model
         return $this->payments->sum('value');
     }
 
-    public function enrollments()
+    public function enrollments(): HasMany
     {
         return $this->hasMany(InvoiceDetail::class)->where('product_type', Enrollment::class);
     }
 
-    public function comments()
+    public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
 
-    public function invoiceType()
+    public function invoiceType(): BelongsTo
     {
         return $this->belongsTo(InvoiceType::class);
     }

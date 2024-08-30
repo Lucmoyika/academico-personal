@@ -6,6 +6,9 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -44,10 +47,8 @@ class Period extends Model
     /**
      * Return the current period to be used as a default system-wide.
      * First look in Config DB table; otherwise select current or closest next period.
-     *
-     * @return self
      */
-    public static function get_default_period()
+    public static function get_default_period(): self
     {
         $configPeriod = Config::where('name', 'current_period');
 
@@ -86,24 +87,24 @@ class Period extends Model
         }
     }
 
-    public function enrollments()
+    public function enrollments(): HasManyThrough
     {
         return $this->hasManyThrough(Enrollment::class, Course::class)
             ->with('course');
     }
 
-    public function courses()
+    public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
     }
 
-    public function year()
+    public function year(): BelongsTo
     {
         return $this->belongsTo(Year::class);
     }
 
     /** returns only pending or paid enrollments, without the child enrollments */
-    public function real_enrollments()
+    public function real_enrollments(): HasManyThrough
     {
         return $this->hasManyThrough(Enrollment::class, Course::class)
         ->whereIn('status_id', ['1', '2']) // pending or paid

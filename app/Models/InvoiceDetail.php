@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Traits\PriceTrait;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -25,7 +27,7 @@ class InvoiceDetail extends Model
         return LogOptions::defaults()->logUnguarded();
     }
 
-    public function invoice()
+    public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
     }
@@ -33,7 +35,7 @@ class InvoiceDetail extends Model
     /**
      * Get the parent invoiceable model
      */
-    public function product()
+    public function product(): MorphTo
     {
         return $this->morphTo();
     }

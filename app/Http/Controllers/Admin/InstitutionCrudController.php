@@ -9,6 +9,7 @@ use Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+use Illuminate\Http\RedirectResponse;
 
 class InstitutionCrudController extends CrudController
 {
@@ -52,7 +53,7 @@ class InstitutionCrudController extends CrudController
         $this->setupCreateOperation();
     }
 
-    public function show($id)
+    public function show($id): RedirectResponse
     {
         return redirect()->route('student.index', ['institution_id' => $id]);
     }

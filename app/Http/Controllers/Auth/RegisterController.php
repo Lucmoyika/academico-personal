@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends \Backpack\CRUD\app\Http\Controllers\Auth\RegisterController
 {
-    public function checkEmailUnicity(Request $request)
+    public function checkEmailUnicity(Request $request): Response
     {
         if (User::where('email', $request->email)->count() !== 0) {
             abort(409);
@@ -42,11 +42,8 @@ class RegisterController extends \Backpack\CRUD\app\Http\Controllers\Auth\Regist
 
     /**
      * Get a validator for an incoming registration request.
-     *
-     *
-     * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    protected function validator(array $data): \Illuminate\Contracts\Validation\Validator
     {
         $user_model_fqn = config('backpack.base.user_model_fqn');
         $user = new $user_model_fqn();
@@ -116,13 +113,9 @@ class RegisterController extends \Backpack\CRUD\app\Http\Controllers\Auth\Regist
 
     /**
      * Handle a registration request for the application.
-     *
-     *
-     * @return Response
      */
-    public function register(Request $request)
+    public function register(Request $request): Response
     {
-
         // if registration is closed, deny access
         if (! config('backpack.base.registration_open')) {
             abort(403, trans('backpack::base.registration_closed'));

@@ -5,6 +5,8 @@ namespace App\Models;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -57,8 +59,7 @@ class CourseTime extends Model
 
         // for each day in the course period span
         while ($today <= $end) {
-
-                // if today is a day of class, create the event
+            // if today is a day of class, create the event
             if ($this->day == $today->format('w') && (! $teacher || ! $teacher->leaves->contains('date', $today->toDateString()))) {
                 Event::create([
                     'course_id' => $this->course->id,
@@ -78,12 +79,12 @@ class CourseTime extends Model
     /** events = class sessions.
      * An Event is related to the CourseTime that generated it. This is needed to update related events when updating the course schedule.
      */
-    public function events()
+    public function events(): HasMany
     {
         return $this->hasMany(Event::class);
     }
 
-    public function course()
+    public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
     }

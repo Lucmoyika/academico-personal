@@ -27,10 +27,8 @@ class TestSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         Campus::create([
             'id' => 1,

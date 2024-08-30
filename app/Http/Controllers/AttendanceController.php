@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use Prologue\Alerts\Facades\Alert;
 
 class AttendanceController extends Controller
@@ -125,8 +126,7 @@ class AttendanceController extends Controller
      */
     public function showCourse(Course $course)
     {
-
-    // The current is not allowed to view the page
+        // The current is not allowed to view the page
         if (Gate::forUser(backpack_user())->denies('view-course-attendance', $course)) {
             abort(403);
         }
@@ -161,10 +161,9 @@ class AttendanceController extends Controller
         return view('attendance/course', compact('attendances', 'isadmin', 'course', 'events'));
     }
 
-    public function showEvent(Event $event)
+    public function showEvent(Event $event): View
     {
-
-    // The current is not allowed to view the page
+        // The current is not allowed to view the page
         if (Gate::forUser(backpack_user())->denies('view-event-attendance', $event)) {
             abort(403);
         }
@@ -191,7 +190,7 @@ class AttendanceController extends Controller
         return view('attendance/event', compact('attendances', 'event', 'attendance_types'));
     }
 
-    public function showStudentAttendanceForCourse(Student $student, Request $request)
+    public function showStudentAttendanceForCourse(Student $student, Request $request): View
     {
         if ($request->query('course_id') == null) {
             $selectedCourse = $student->enrollments->last()->course;

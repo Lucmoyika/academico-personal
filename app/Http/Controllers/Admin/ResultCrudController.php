@@ -12,6 +12,7 @@ use Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 /**
  * Class ResultCrudController
@@ -130,7 +131,7 @@ class ResultCrudController extends CrudController
     /**
      * Display the specified resource (result for a specific enrollment).
      */
-    public function show($enrollment)
+    public function show($enrollment): View
     {
         // the user is allowed to view the result if they are the student,
         // if they are the teacher of the course for this result

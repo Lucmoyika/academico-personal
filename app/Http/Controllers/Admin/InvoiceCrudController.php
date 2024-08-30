@@ -18,6 +18,7 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 use Ramsey\Uuid\Uuid;
 use ZipArchive;
 
@@ -229,7 +230,7 @@ class InvoiceCrudController extends CrudController
         ]);
     }
 
-    public function show($id)
+    public function show($id): View
     {
         $invoice = Invoice::findOrFail($id)->load('payments');
 

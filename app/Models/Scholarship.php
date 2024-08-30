@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -23,7 +24,7 @@ class Scholarship extends Model
         return LogOptions::defaults()->logUnguarded();
     }
 
-    public function enrollments()
+    public function enrollments(): BelongsToMany
     {
         return $this->belongsToMany(Enrollment::class);
     }

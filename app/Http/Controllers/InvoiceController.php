@@ -22,14 +22,14 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class InvoiceController extends Controller
 {
     public function __construct(
-        public InvoiceService     $invoiceDocumentService,
+        public InvoiceService $invoiceDocumentService,
         public InvoicingInterface $invoicingService,
-    )
-    {
+    ) {
         parent::__construct();
         $this->middleware(['permission:enrollments.edit']);
     }
@@ -39,7 +39,7 @@ class InvoiceController extends Controller
         return $this->invoicingService->status();
     }
 
-    public function create()
+    public function create(): View
     {
         if (config('invoicing.price_categories_enabled')) {
             abort(403, 'Unable to create an invoice because price categories are enabled in your setup.');
@@ -62,7 +62,6 @@ class InvoiceController extends Controller
      */
     public function store(Request $request)
     {
-
         // receive the client data and create a invoice with status = pending
         $invoice = Invoice::create([
             'client_name' => $request->client_name,

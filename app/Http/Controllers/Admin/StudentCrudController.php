@@ -22,8 +22,10 @@ use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class StudentCrudController extends CrudController
 {
@@ -360,7 +362,7 @@ class StudentCrudController extends CrudController
         $this->setupCreateOperation();
     }
 
-    public function store()
+    public function store(): RedirectResponse
     {
         $request = $this->crud->getRequest();
 
@@ -460,7 +462,7 @@ class StudentCrudController extends CrudController
         return $this->crud->performSaveAction($item->getKey());
     }
 
-    public function show($student)
+    public function show($student): View
     {
         $student = Student::findOrFail($student);
 

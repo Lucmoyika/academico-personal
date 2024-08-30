@@ -10,13 +10,14 @@ use App\Models\Skills\SkillEvaluation;
 use App\Models\Skills\SkillScale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class CourseSkillEvaluationController extends Controller
 {
     /**
      * Show the skills overview for all students in the course.
      */
-    public function index(Course $course)
+    public function index(Course $course): View
     {
         if (Gate::forUser(backpack_user())->denies('view-course', $course)) {
             abort(403);

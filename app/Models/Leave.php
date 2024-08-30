@@ -6,6 +6,7 @@ use App\Events\LeaveCreated;
 use App\Events\LeaveUpdated;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -54,12 +55,12 @@ class Leave extends Model
         return self::limit(15)->get()->groupBy('teacher_id'); // todo return first teacher with date span
     }
 
-    public function leaveType()
+    public function leaveType(): BelongsTo
     {
         return $this->belongsTo(LeaveType::class, 'leave_type_id');
     }
 
-    public function teacher()
+    public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class);
     }

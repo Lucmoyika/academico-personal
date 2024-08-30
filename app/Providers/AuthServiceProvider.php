@@ -19,13 +19,9 @@ class AuthServiceProvider extends ServiceProvider
 
     /**
      * Register any authentication / authorization services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        $this->registerPolicies();
-
         /*
          * a user is allowed to edit the course grades if they are the teacher for this course,
          * or if they have explicit permission to do so
