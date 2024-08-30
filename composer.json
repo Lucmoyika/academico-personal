@@ -37,6 +37,7 @@
         "backpack/generators": "^3.3",
         "barryvdh/laravel-ide-helper": "^2.13",
         "brianium/paratest": "^6.4",
+        "deployer/deployer": "^7.4",
         "fakerphp/faker": "^1.9.1",
         "filp/whoops": "^2.14",
         "jasonmccreary/laravel-test-assertions": "^2.3",
