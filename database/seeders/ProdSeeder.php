@@ -10,10 +10,12 @@ use App\Models\EvaluationType;
 use App\Models\LeadType;
 use App\Models\LeaveType;
 use App\Models\Paymentmethod;
+use App\Models\Period;
 use App\Models\ResultType;
 use App\Models\Skills\SkillScale;
 use App\Models\User;
 use App\Models\Year;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -84,11 +86,7 @@ class ProdSeeder extends Seeder
 
         EvaluationType::create([
             'id' => 1,
-            'name' => [
-                'fr' => 'NOTES',
-                'es' => 'NOTAS',
-                'en' => 'GRADES',
-            ],
+            'name' => 'NOTES',
         ]);
 
         AttendanceType::create([
@@ -300,8 +298,15 @@ class ProdSeeder extends Seeder
 
         $admin->assignRole('admin');
 
-        factory(Year::class)->create([
-            'name' => '2021',
+        $year = factory(Year::class)->create([
+            'name' => '2025',
+        ]);
+
+        Period::create([
+            'name' => 'Default',
+            'year_id' => $year->id,
+            'start' => Carbon::now(),
+            'end' => Carbon::now()->addMonth(),
         ]);
     }
 }
