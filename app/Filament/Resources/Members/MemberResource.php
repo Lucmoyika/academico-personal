@@ -42,14 +42,17 @@ class MemberResource extends Resource
         return $schema
             ->components([
                 TextInput::make('firstname')
+                    ->label(__('First name'))
                     ->required()
                     ->minLength(1)
                     ->maxLength(255),
                 TextInput::make('lastname')
+                    ->label(__('Last name'))
                     ->required()
                     ->minLength(1)
                     ->maxLength(255),
                 TextInput::make('email')
+                    ->label(__('Email'))
                     ->email()
                     ->nullable(),
             ]);
@@ -60,12 +63,15 @@ class MemberResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('firstname')
+                    ->label(__('First name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('lastname')
+                    ->label(__('Last name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('email')
+                    ->label(__('Email'))
                     ->searchable(),
             ])
             ->filters([

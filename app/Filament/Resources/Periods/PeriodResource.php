@@ -59,13 +59,16 @@ class PeriodResource extends Resource
                             ->maxLength(10),
                     ]),
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->minLength(1)
                     ->maxLength(40)
                     ->unique(ignoreRecord: true),
                 DatePicker::make('start')
+                    ->label(__('Start Date'))
                     ->required(),
                 DatePicker::make('end')
+                    ->label(__('End Date'))
                     ->required(),
                 Toggle::make('archived')
                     ->label(__('Archived')),
@@ -79,12 +82,15 @@ class PeriodResource extends Resource
                 TextColumn::make('year.name')
                     ->sortable(),
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('start')
+                    ->label(__('Start Date'))
                     ->date()
                     ->sortable(),
                 TextColumn::make('end')
+                    ->label(__('End Date'))
                     ->date()
                     ->sortable(),
                 IconColumn::make('archived')

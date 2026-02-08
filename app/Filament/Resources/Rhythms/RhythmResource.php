@@ -51,14 +51,18 @@ class RhythmResource extends Resource
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->minLength(1)
                     ->maxLength(40)
                     ->unique(ignoreRecord: true),
                 TextInput::make('default_volume')
+                    ->label(__('Default Volume'))
                     ->required()
                     ->numeric(),
-                TextInput::make('product_code'),
+                TextInput::make('product_code')
+                    ->label(__('Product Code'))
+                    ->nullable(),
             ]);
     }
 
@@ -67,9 +71,11 @@ class RhythmResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('default_volume')
+                    ->label(__('Default Volume'))
                     ->sortable(),
                 TextColumn::make('product_code'),
             ])

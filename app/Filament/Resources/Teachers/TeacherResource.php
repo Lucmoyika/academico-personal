@@ -59,6 +59,7 @@ class TeacherResource extends Resource
                     ->required()
                     ->maxLength(255),
                 TextInput::make('email')
+                    ->label(__('Email'))
                     ->email()
                     ->required()
                     ->maxLength(255),
@@ -68,6 +69,7 @@ class TeacherResource extends Resource
                     ->step(0.01)
                     ->nullable(),
                 DatePicker::make('hired_at')
+                    ->label(__('Hire Date'))
                     ->nullable(),
             ]);
     }
@@ -92,6 +94,7 @@ class TeacherResource extends Resource
                     ->numeric(decimalPlaces: 2)
                     ->sortable(),
                 TextColumn::make('hired_at')
+                    ->label(__('Hire Date'))
                     ->date()
                     ->sortable(),
             ])

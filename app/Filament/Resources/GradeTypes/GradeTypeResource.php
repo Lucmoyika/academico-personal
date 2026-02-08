@@ -45,6 +45,7 @@ class GradeTypeResource extends Resource
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->minLength(1)
                     ->maxLength(255)
@@ -54,6 +55,7 @@ class GradeTypeResource extends Resource
                     ->integer()
                     ->minValue(0),
                 Select::make('grade_type_category_id')
+                    ->label(__('Category'))
                     ->relationship('category', 'name')
                     ->label(__('Category'))
                     ->searchable()
@@ -66,9 +68,11 @@ class GradeTypeResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('total')
+                    ->label(__('Total'))
                     ->sortable(),
                 TextColumn::make('category.name')
                     ->label(__('Category'))

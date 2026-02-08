@@ -52,6 +52,7 @@ class RoomResource extends Resource
         return $schema
             ->components([
                 Select::make('campus_id')
+                    ->label(__('Campus'))
                     ->relationship('campus', 'name')
                     ->required(),
                 TextInput::make('name')
@@ -60,6 +61,7 @@ class RoomResource extends Resource
                     ->maxLength(40)
                     ->unique(ignoreRecord: true),
                 TextInput::make('capacity')
+                    ->label(__('Capacity'))
                     ->numeric(),
             ]);
     }
@@ -71,9 +73,11 @@ class RoomResource extends Resource
                 TextColumn::make('campus.name')
                     ->sortable(),
                 TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('capacity')
+                    ->label(__('Capacity'))
                     ->numeric()
                     ->sortable(),
             ])
