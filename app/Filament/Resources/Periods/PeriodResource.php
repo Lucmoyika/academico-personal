@@ -5,10 +5,13 @@ namespace App\Filament\Resources\Periods;
 use App\Filament\Resources\Periods\Pages\ListPeriods;
 use App\Models\Period;
 use BackedEnum;
+use App\Models\Config;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -103,6 +106,20 @@ class PeriodResource extends Resource
                     ->preload(),
             ])
             ->recordActions([
+                Action::make('setAsCurrentPeriod')
+                    ->label(__('Set as current'))
+                    ->icon('heroicon-m-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (Period $record) {
+                        Config::where('name', 'current_period')->update(['value' => $record->id]);
+
+                        Notification::make()
+                            ->title(__('Current period updated'))
+                            ->body($record->name)
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

@@ -1,21 +1,58 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# About this project
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Academico is an open-source, Lavarel-based school management platform. Its main features include course management, enrolments management, resources scheduling, reports and stats. It is primarily targeted at small and medium-sized institutions who need a simple and affordable solution to manage their school and courses.
 
-## Docker Setup
+# New 2026 version (Filament-based)
+The first versions of this project were built with the awesome Backpack for Laravel framework. However, the application was entirely rewritten with Laravel Filament. No changes in the database structure has been made, so the Filament version should work as a drop-in replacement of the Backpack version, with similar features. You can still access the Backpack version in the `filament-pro` branch (a Backpack license is required). 
+
+# Contributors welcome! ✨
+If you are using this applications and want to make some improvements for your own needs, or just willing to contribute to an open-source project, please see [this page on the wiki](https://github.com/laxsmi/academico/wiki/Development-Roadmap) for details.
+
+Thanks goes to these wonderful people for past or current version of this application ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/thdebay"><img src="https://avatars3.githubusercontent.com/u/1422621?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Thomas Debay</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=thdebay" title="Code">💻</a> <a href="https://github.com/academico-sis/academico/commits?author=thdebay" title="Documentation">📖</a> <a href="#ideas-thdebay" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-thdebay" title="Maintenance">🚧</a> <a href="https://github.com/academico-sis/academico/commits?author=thdebay" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/marcmarina"><img src="https://avatars3.githubusercontent.com/u/38327883?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marc Marina Miravitlles</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=marcmarina" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/damienBAUDET"><img src="https://avatars1.githubusercontent.com/u/51827692?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Damien Baudet</b></sub></a><br /><a href="#maintenance-damienBAUDET" title="Maintenance">🚧</a> <a href="https://github.com/academico-sis/academico/commits?author=damienBAUDET" title="Code">💻</a></td>
+    <td align="center"><a href="http://techarewa.com"><img src="https://avatars3.githubusercontent.com/u/7858376?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mubarak M Aminu</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=mubarak23" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Aybee5"><img src="https://avatars1.githubusercontent.com/u/42099896?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ibrahim Abdullahi Aliyu</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=Aybee5" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/AleksandarMitevski"><img src="https://avatars3.githubusercontent.com/u/59975218?v=4?s=100" width="100px;" alt=""/><br /><sub><b>AleksandarMitevski</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=AleksandarMitevski" title="Tests">⚠️</a> <a href="https://github.com/academico-sis/academico/commits?author=AleksandarMitevski" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/TanoRojas"><img src="https://avatars0.githubusercontent.com/u/7780437?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tano Rojas</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=TanoRojas" title="Tests">⚠️</a> <a href="https://github.com/academico-sis/academico/commits?author=TanoRojas" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://cirkovic.me"><img src="https://avatars0.githubusercontent.com/u/32557332?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nikola Cirkovic</b></sub></a><br /><a href="https://github.com/academico-sis/academico/issues?q=author%3ACirkaN" title="Bug reports">🐛</a> <a href="#maintenance-CirkaN" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/quieneslatern"><img src="https://avatars.githubusercontent.com/u/57142715?v=4?s=100" width="100px;" alt=""/><br /><sub><b>quieneslatern</b></sub></a><br /><a href="#translation-quieneslatern" title="Translation">🌍</a></td>
+    <td align="center"><a href="https://bit.ly/doode-website"><img src="https://avatars.githubusercontent.com/u/1921806?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Vitor Micillo</b></sub></a><br /><a href="#maintenance-vitormicillo" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/Dummdevka"><img src="https://avatars.githubusercontent.com/u/87282400?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tatiana Goloviznina</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=Dummdevka" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/rm-yakovenko"><img src="https://avatars.githubusercontent.com/u/2056667?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rm Yakovenko</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=rm-yakovenko" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/MizouziE"><img src="https://avatars.githubusercontent.com/u/90829439?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sam</b></sub></a><br /><a href="https://github.com/academico-sis/academico/commits?author=MizouziE" title="Code">💻</a> <a href="https://github.com/academico-sis/academico/commits?author=MizouziE" title="Documentation">📖</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+
+# Getting started
 
 This application runs in Docker using FrankenPHP, a modern application server for PHP built on Caddy.
 
-### Prerequisites
+## Prerequisites
 - Docker Desktop installed
 - Docker Compose installed
 
-### Quick Start
+## Quick Start
 
 1. Copy the environment file:
 ```bash
@@ -27,7 +64,7 @@ cp .env.example .env
 docker-compose up -d
 ```
 
-3. Install dependencies (if not using the built image):
+3. Install dependencies:
 ```bash
 docker-compose exec app composer install
 docker-compose exec app npm install && npm run build
@@ -44,75 +81,3 @@ docker-compose exec app php artisan migrate
 ```
 
 6. Access the application at `http://localhost:8080`
-
-### Services
-
-- **app**: Laravel application with FrankenPHP (PHP 8.5) - ports 8080 (HTTP) and 8443 (HTTPS)
-- **db**: MariaDB 11 database (port 3306)
-
-### Useful Commands
-
-```bash
-# Stop containers
-docker-compose down
-
-# View logs
-docker-compose logs -f
-
-# Run artisan commands
-docker-compose exec app php artisan [command]
-
-# Access the database
-docker-compose exec db mysql -u academico_user -p academico_filament
-```
-
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

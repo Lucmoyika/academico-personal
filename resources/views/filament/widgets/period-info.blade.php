@@ -1,6 +1,10 @@
 <x-filament-widgets::widget>
     <x-filament::section>
-        <x-slot name="heading">{{ __('Period Information') }}</x-slot>
+        <x-slot name="heading">
+            <div class="flex items-center justify-between">
+                <span>{{ __('Period Information') }}</span>
+            </div>
+        </x-slot>
 
         @php
             $data = $this->getData();
@@ -8,10 +12,20 @@
 
         <div class="space-y-4">
             @if($data['currentPeriod'])
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Current Period') }}</p>
-                    <p class="text-lg font-semibold">{{ $data['currentPeriod']->name }}</p>
+                <div class="flex w-full">
+                    <div>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ __('Current Period') }} : </span>
+                        <span class="text-lg font-semibold">{{ $data['currentPeriod']->name }}</span>
+                    </div>
+
+                    <div>
+                        <x-filament::button size="sm" color="gray" icon="heroicon-m-pencil-square" :href="$this->getPeriodsUrl()" tag="a">
+                            {{ __('Change') }}
+                        </x-filament::button>
+                    </div>
                 </div>
+
+
             @endif
 
             @if($data['enrollmentsPeriod'])

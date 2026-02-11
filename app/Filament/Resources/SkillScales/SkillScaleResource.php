@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\SkillScales;
 
-use App\Filament\Resources\Concerns\Translatable;
 use App\Filament\Resources\SkillScales\Pages\ManageSkillScales;
 use App\Models\Skills\SkillScale;
 use BackedEnum;
@@ -19,8 +18,6 @@ use Filament\Tables\Table;
 
 class SkillScaleResource extends Resource
 {
-    use Translatable;
-
     protected static ?string $model = SkillScale::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedScale;

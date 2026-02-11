@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\LeaveTypes;
 
-use App\Filament\Resources\Concerns\Translatable;
 use App\Filament\Resources\LeaveTypes\Pages\ManageLeaveTypes;
 use App\Models\LeaveType;
 use BackedEnum;
@@ -19,8 +18,6 @@ use Filament\Tables\Table;
 
 class LeaveTypeResource extends Resource
 {
-    use Translatable;
-
     protected static ?string $model = LeaveType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendar;

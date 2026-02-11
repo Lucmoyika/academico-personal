@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\GradeTypeCategories;
 
-use App\Filament\Resources\Concerns\Translatable;
 use App\Filament\Resources\GradeTypeCategories\Pages\ManageGradeTypeCategories;
 use App\Models\GradeTypeCategory;
 use BackedEnum;
@@ -19,8 +18,6 @@ use Filament\Tables\Table;
 
 class GradeTypeCategoryResource extends Resource
 {
-    use Translatable;
-
     protected static ?string $model = GradeTypeCategory::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;

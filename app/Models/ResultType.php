@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasFallbackTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class ResultType extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasFallbackTranslations;
 
     protected $guarded = ['id'];
 
@@ -18,11 +18,11 @@ class ResultType extends Model
 
     public function getTranslatedNameAttribute()
     {
-        return $this->getTranslation('name', app()->getLocale());
+        return $this->name;
     }
 
     public function getTranslatedDescriptionAttribute()
     {
-        return $this->getTranslation('description', app()->getLocale());
+        return $this->description;
     }
 }

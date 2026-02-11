@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\LeadTypes;
 
-use App\Filament\Resources\Concerns\Translatable;
 use App\Filament\Resources\LeadTypes\Pages\ManageLeadTypes;
 use App\Models\LeadType;
 use BackedEnum;
@@ -20,8 +19,6 @@ use Filament\Tables\Table;
 
 class LeadTypeResource extends Resource
 {
-    use Translatable;
-
     protected static ?string $model = LeadType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFunnel;

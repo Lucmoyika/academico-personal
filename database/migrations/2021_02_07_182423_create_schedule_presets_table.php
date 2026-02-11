@@ -24,5 +24,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('schedule_presets');
+        // todo - remove this table after migration from backpack is complete.
     }
 };

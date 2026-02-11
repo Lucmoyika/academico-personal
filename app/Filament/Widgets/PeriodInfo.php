@@ -2,12 +2,13 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\Periods\PeriodResource;
 use App\Models\Period;
 use Filament\Widgets\Widget;
 
 class PeriodInfo extends Widget
 {
-    protected static ?int $sort = 2;
+    protected static ?int $sort = -2;
 
     protected string $view = 'filament.widgets.period-info';
 
@@ -22,5 +23,10 @@ class PeriodInfo extends Widget
             'currentPeriod' => $currentPeriod,
             'enrollmentsPeriod' => $enrollmentsPeriod,
         ];
+    }
+
+    public function getPeriodsUrl(): string
+    {
+        return PeriodResource::getUrl('index');
     }
 }

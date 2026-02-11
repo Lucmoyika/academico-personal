@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\ResultTypes;
 
-use App\Filament\Resources\Concerns\Translatable;
 use App\Filament\Resources\ResultTypes\Pages\ManageResultTypes;
 use App\Models\ResultType;
 use BackedEnum;
@@ -20,8 +19,6 @@ use Filament\Tables\Table;
 
 class ResultTypeResource extends Resource
 {
-    use Translatable;
-
     protected static ?string $model = ResultType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;

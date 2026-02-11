@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Courses;
 
+use App\Filament\Resources\Courses\Pages\CourseBlockView;
+use App\Filament\Resources\Courses\Pages\CourseEnrollments;
 use App\Filament\Resources\Courses\Pages\CreateCourse;
 use App\Filament\Resources\Courses\Pages\EditCourse;
 use App\Filament\Resources\Courses\Pages\ListCourses;
@@ -264,8 +266,10 @@ class CourseResource extends Resource
     {
         return [
             'index' => ListCourses::route('/'),
+            'block-view' => CourseBlockView::route('/block-view'),
             'create' => CreateCourse::route('/create'),
             'edit' => EditCourse::route('/{record}/edit'),
+            'enrollments' => CourseEnrollments::route('/{record}/enrollments'),
         ];
     }
 }

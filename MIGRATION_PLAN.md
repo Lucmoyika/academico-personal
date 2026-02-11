@@ -246,19 +246,17 @@ Here's the **complete final audit** comparing the old project against the new on
 
 ## RED — Functionality Gaps (likely to cause runtime issues)
 
-### 1. Authorization Gates NOT migrated
-The old AuthServiceProvider.php defines **11 Gate** rules controlling who can edit grades, view/edit attendance, view calendars, view courses, view enrollments, enroll students, view teacher hours, and edit results. **None of these exist in the new project.** 
+### ~~1. Authorization Gates NOT migrated~~ ✅ DONE
+All 11 Gate definitions have been migrated to `AppServiceProvider::registerGates()`. The `CourseEnrollments` page uses `Gate::allows('view-course')`. `AFLojaCertificatesService` gate checks (`view-enrollment`, `view-course`) now resolve correctly.
 
-These are used by the student-facing Livewire pages and teacher dashboard. Filament resource policies handle admin panel access, but non-panel pages (attendance, grades, teacher dashboard) rely on these gates.
-
-### 2. SetLocale middleware not registered
-SetLocale.php exists but is **not registered** in bootstrap/app.php. Locale switching won't work for web routes.
+### ~~2. SetLocale middleware not registered~~ ✅ DONE
+`SetLocale` was already registered in `AdminPanelProvider` for Filament panel routes. Now also appended to the `web` middleware stack in `bootstrap/app.php` so student-facing routes (`/dashboard`, `/account`) and public routes (`/register`) also get locale switching.
 
 ### 3. MailerLite SDK package missing
 MailerliteService.php imports `MailerLiteApi\MailerLite` but `mailerlite/mailerlite-api-v2-php-sdk` is **not in composer.json**. Any code path touching this service will fatal error.
 
-### 4. Three model policies not migrated
-The old project had `CommentPolicy`, `ContactPolicy`, and `StudentPolicy` in Policies. None exist in the new project.
+### ~~4. Three model policies not migrated~~ ✅ No action needed
+`CommentPolicy`, `ContactPolicy`, and `StudentPolicy` were dead code in the old project — placed in a non-standard namespace (`App\Models\Policies`), never registered in `AuthServiceProvider`, and never referenced by any controller or gate. The permissions they checked (`comments.edit`, `student.edit`) exist as seeded Spatie permissions, but the policies themselves were never wired up. Relevant authorization is handled by the migrated gates and Filament resource-level access controls.
 
 ### 5. Two events/listeners removed without replacement
 - `CourseCreated` event + listener — was triggered on course creation
@@ -270,10 +268,10 @@ The old project had `CommentPolicy`, `ContactPolicy`, and `StudentPolicy` in Pol
 
 | # | Item | Details |
 |---|------|---------|
-| 6 | **PDF export templates** | Certificate/result/syllabus blade templates may be missing from views. The services exist but could reference missing views. |
-| 7 | **`ExternalCourseFactory`** | Missing factory — tests for external courses can't use factory builder. |
+| 6 | ~~**PDF export templates**~~ ✅ | Copied 3 missing blade views from old project: `results/certificate.blade.php`, `results/export.blade.php`, `results/course-export.blade.php`. These are standalone HTML templates rendered by `AFLojaCertificatesService` via mPDF. The `ResultResource` actions (`export_result`, `export_certificate`) already call the service correctly. Note: `exportCourseResults()` exists in the service/interface but has no Filament trigger yet (it wasn't linked from any view in the old project either). No syllabus templates exist in either project. |
+| 7 | ~~**`ExternalCourseFactory`**~~ ✅ No action needed | There is no `ExternalCourse` model — external courses are `Course` records with a non-null `partner_id`. The old factory was a legacy-syntax duplicate of `CourseFactory`. Tests already use `Course::factory()->create(['partner_id' => 1])`. |
 | 8 | **`POST /api/checkemail`** | Email uniqueness API endpoint for registration not in new project. |
-| 9 | **Photo roster** | Old project had `ShowStudentPhotoRosterOperation` — no equivalent in Filament. |
+| 9 | ~~**Photo roster**~~ ✅ | Implemented as a "Photo roster" toggle mode on the `CourseEnrollments` page. Cards show student photo + name in a responsive grid. |
 | 10 | **Standalone invoice creation route** | `GET /createinvoice` existed for admins — verify in Filament. |
 | 11 | **Public assets** | `watermark.png`, `logo.png`, `user-icon-placeholder.png` — verify these exist if PDFs reference them. |
 | 12 | **`ext-gd`, `ext-zip`** | Not declared in new composer.json. Needed for image processing & ZIP exports. |

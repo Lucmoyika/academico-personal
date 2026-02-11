@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Campuses;
 
 use App\Filament\Resources\Campuses\Pages\ManageCampuses;
-use App\Filament\Resources\Concerns\Translatable;
 use App\Models\Campus;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -26,8 +25,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CampusResource extends Resource
 {
-    use Translatable;
-
     protected static ?string $model = Campus::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingLibrary;

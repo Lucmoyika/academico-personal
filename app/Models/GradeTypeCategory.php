@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasFallbackTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class GradeTypeCategory extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasFallbackTranslations;
 
     protected $table = 'grade_type_categories';
 
@@ -22,6 +22,6 @@ class GradeTypeCategory extends Model
 
     public function getTranslatedNameAttribute()
     {
-        return $this->getTranslation('name', app()->getLocale());
+        return $this->name;
     }
 }

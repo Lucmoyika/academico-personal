@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\AttendanceTypes;
 
 use App\Filament\Resources\AttendanceTypes\Pages\ManageAttendanceTypes;
-use App\Filament\Resources\Concerns\Translatable;
 use App\Models\AttendanceType;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -21,8 +20,6 @@ use Filament\Tables\Table;
 
 class AttendanceTypeResource extends Resource
 {
-    use Translatable;
-
     protected static ?string $model = AttendanceType::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;

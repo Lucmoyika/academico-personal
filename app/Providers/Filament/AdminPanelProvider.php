@@ -44,6 +44,10 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
             ])
             ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => Blade::render('@vite(\'resources/css/app.css\')'),
+            )
+            ->renderHook(
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('@livewire(\'locale-switcher\')'),
             )
