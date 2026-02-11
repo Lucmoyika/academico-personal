@@ -10,6 +10,8 @@ use App\Filament\Resources\Courses\Pages\ListCourses;
 use App\Models\Course;
 use App\Models\Period;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -208,26 +210,42 @@ class CourseResource extends Resource
                     ->sortable(),
                 TextColumn::make('volume')
                     ->suffix('h')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable()
+                ,
                 TextColumn::make('teacher.name')
                     ->label(__('Teacher'))
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable()
+                ,
                 TextColumn::make('room.name')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable()
+                ,
                 TextColumn::make('course_times')
-                    ->label(__('Schedule')),
+                    ->label(__('Schedule'))
+                    ->toggleable()
+                ,
                 TextColumn::make('course_enrollments_count')
                     ->label(__('Enrollments'))
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable()
+                ,
                 TextColumn::make('start_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable()
+                ,
                 TextColumn::make('end_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable()
+                ,
                 IconColumn::make('marked')
                     ->boolean()
-                    ->label(__('Eval')),
+                    ->label(__('Eval'))
+                    ->toggleable()
+                ,
             ])
             ->filters([
                 SelectFilter::make('period_id')
@@ -252,8 +270,14 @@ class CourseResource extends Resource
             ])
             ->defaultSort('start_date', 'desc')
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    Action::make('view_enrollments')
+                        ->label(__('View Enrollments'))
+                        ->icon('heroicon-o-academic-cap')
+                        ->url(fn ($record) => static::getUrl('enrollments', ['record' => $record])),
+                    DeleteAction::make(),
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

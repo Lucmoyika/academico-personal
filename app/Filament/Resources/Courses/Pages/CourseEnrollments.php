@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Courses\Pages;
 
 use App\Filament\Resources\Courses\CourseResource;
 use App\Filament\Resources\Enrollments\EnrollmentResource;
+use App\Filament\Resources\Students\StudentResource;
 use App\Models\Course;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
@@ -87,7 +88,16 @@ class CourseEnrollments extends Page implements HasTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('id', 'desc')
-            ->recordUrl(fn ($record) => EnrollmentResource::getUrl('edit', ['record' => $record]));
+            ->recordUrl(fn ($record) => auth()->user()->can('enrollments.edit')
+                ? EnrollmentResource::getUrl('edit', ['record' => $record])
+                : StudentResource::getUrl('edit', ['record' => $record->student_id]))
+            ->recordActions([
+                Action::make('view_student')
+                    ->label(__('Student'))
+                    ->icon('heroicon-o-user')
+                    ->url(fn ($record) => StudentResource::getUrl('edit', ['record' => $record->student_id]))
+                    ->visible(fn () => auth()->user()->can('enrollments.edit')),
+            ]);
     }
 
     public function getTitle(): string

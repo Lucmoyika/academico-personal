@@ -4,10 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Course;
 use App\Models\Enrollment;
-use App\Models\EnrollmentStatusType;
 use App\Models\Event;
 use App\Models\Student;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,11 +17,11 @@ class CourseFeatureTest extends TestCase
     {
         parent::setUp();
 
-        Model::unguard();
-        EnrollmentStatusType::create(['id' => 1, 'name' => 'Pending']);
-        EnrollmentStatusType::create(['id' => 2, 'name' => 'Paid']);
-        EnrollmentStatusType::create(['id' => 3, 'name' => 'Cancelled']);
-        Model::reguard();
+        \DB::table('enrollment_status_types')->insert([
+            ['id' => 1, 'name' => json_encode(['fr' => 'Pending'])],
+            ['id' => 2, 'name' => json_encode(['fr' => 'Paid'])],
+            ['id' => 3, 'name' => json_encode(['fr' => 'Cancelled'])],
+        ]);
     }
 
     public function test_course_accepts_new_students_when_spots_available(): void

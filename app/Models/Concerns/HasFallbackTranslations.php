@@ -13,7 +13,9 @@ use Spatie\Translatable\HasTranslations;
  */
 trait HasFallbackTranslations
 {
-    use HasTranslations;
+    use HasTranslations {
+        HasTranslations::setTranslation as baseSetTranslation;
+    }
 
     protected static array $localePriority = ['fr', 'es', 'en'];
 
@@ -39,6 +41,6 @@ trait HasFallbackTranslations
 
     public function setTranslation(string $key, string $locale, mixed $value): self
     {
-        return parent::setTranslation($key, 'fr', $value);
+        return $this->baseSetTranslation($key, 'fr', $value);
     }
 }

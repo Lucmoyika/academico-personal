@@ -3,13 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Attendance;
-use App\Models\AttendanceType;
 use App\Models\Course;
 use App\Models\Enrollment;
-use App\Models\EnrollmentStatusType;
 use App\Models\Event;
 use App\Models\Student;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,15 +18,17 @@ class AttendanceFeatureTest extends TestCase
     {
         parent::setUp();
 
-        Model::unguard();
-        EnrollmentStatusType::create(['id' => 1, 'name' => 'Pending']);
-        EnrollmentStatusType::create(['id' => 2, 'name' => 'Paid']);
+        \DB::table('enrollment_status_types')->insert([
+            ['id' => 1, 'name' => json_encode(['fr' => 'Pending'])],
+            ['id' => 2, 'name' => json_encode(['fr' => 'Paid'])],
+        ]);
 
-        AttendanceType::create(['id' => 1, 'name' => 'Present']);
-        AttendanceType::create(['id' => 2, 'name' => 'Late']);
-        AttendanceType::create(['id' => 3, 'name' => 'Absent - Justified']);
-        AttendanceType::create(['id' => 4, 'name' => 'Absent - Unjustified']);
-        Model::reguard();
+        \DB::table('attendance_types')->insert([
+            ['id' => 1, 'name' => json_encode(['fr' => 'Present'])],
+            ['id' => 2, 'name' => json_encode(['fr' => 'Late'])],
+            ['id' => 3, 'name' => json_encode(['fr' => 'Absent - Justified'])],
+            ['id' => 4, 'name' => json_encode(['fr' => 'Absent - Unjustified'])],
+        ]);
     }
 
     public function test_attendance_can_be_recorded_for_event(): void
