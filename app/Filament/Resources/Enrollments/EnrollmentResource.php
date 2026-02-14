@@ -2,20 +2,29 @@
 
 namespace App\Filament\Resources\Enrollments;
 
-use App\Filament\Resources\Enrollments\Pages\EditEnrollment;
+use App\Filament\RelationManagers\CommentsRelationManager;
+use App\Filament\Resources\Courses\CourseResource;
+use App\Filament\Resources\Enrollments\Pages\ChangeEnrollmentCourse;
 use App\Filament\Resources\Enrollments\Pages\ListEnrollments;
+use App\Filament\Resources\Enrollments\Pages\ViewEnrollment;
+use App\Filament\Resources\Enrollments\RelationManagers\ScholarshipsRelationManager;
+use App\Filament\Resources\Students\StudentResource;
 use App\Models\Enrollment;
 use App\Models\Period;
 use BackedEnum;
+use Carbon\Carbon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -42,34 +51,45 @@ class EnrollmentResource extends Resource
         return __('Enrollments');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function infolist(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Select::make('course_id')
-                    ->label(__('Course'))
-                    ->relationship('course', 'name')
-                    ->required()
-                    ->preload()
-                    ->searchable(),
-                TextInput::make('total_price')
-                    ->label(__('Price'))
-                    ->numeric()
-                    ->minValue(0)
-                    ->step(0.01)
-                    ->prefix(config('academico.currency_position') === 'before' ? config('academico.currency_symbol') : null)
-                    ->suffix(config('academico.currency_position') === 'after' ? config('academico.currency_symbol') : null),
-                Select::make('status_id')
-                    ->label(__('Status'))
-                    ->relationship('enrollmentStatus', 'name')
-                    ->required()
-                    ->preload(),
-                Select::make('scholarships')
-                    ->label(__('Scholarships'))
-                    ->relationship('scholarships', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->searchable(),
+                Section::make(__('Enrollment Info'))
+                    ->columns(2)
+                    ->columnSpanFull()
+                    ->schema([
+                        TextEntry::make('student.name')
+                            ->label(__('Student'))
+                            ->url(fn (Enrollment $record) => StudentResource::getUrl('edit', ['record' => $record->student_id])),
+                        TextEntry::make('created_at')
+                            ->label(__('Enrollment date'))
+                            ->date(),
+                        TextEntry::make('id')
+                            ->label(__('Enrollment ID')),
+                        TextEntry::make('course.name')
+                            ->label(__('Course'))
+                            ->url(fn (Enrollment $record) => CourseResource::getUrl('edit', ['record' => $record->course_id])),
+                        TextEntry::make('course.period.name')
+                            ->label(__('Period')),
+                        TextEntry::make('enrollmentStatus.name')
+                            ->label(__('Status'))
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'Pending' => 'warning',
+                                'Paid' => 'success',
+                                default => 'gray',
+                            }),
+                        TextEntry::make('total_price')
+                            ->label(__('Price'))
+                            ->money(config('academico.currency_code', 'USD')),
+                        TextEntry::make('childrenEnrollments.course.name')
+                            ->label(__('Children Enrollments'))
+                            ->placeholder('-'),
+                        TextEntry::make('result.result_name.name')
+                            ->label(__('Result'))
+                            ->placeholder('-'),
+                    ]),
             ]);
     }
 
@@ -133,10 +153,31 @@ class EnrollmentResource extends Resource
                     ->label(__('Status'))
                     ->multiple()
                     ->preload(),
+                SelectFilter::make('scholarship')
+                    ->relationship('scholarships', 'name')
+                    ->label(__('Scholarship'))
+                    ->preload(),
+                Filter::make('age')
+                    ->label(__('Age'))
+                    ->schema([
+                        TextInput::make('age')
+                            ->label(__('Age'))
+                            ->numeric()
+                            ->minValue(0),
+                    ])
+                    ->query(function ($query, array $data) {
+                        if ($data['age']) {
+                            $age = (int) $data['age'];
+                            $query->whereHas('student', fn ($q) => $q
+                                ->where('birthdate', '<=', Carbon::now()->subYears($age))
+                                ->where('birthdate', '>', Carbon::now()->subYears($age + 1)));
+                        }
+                    }),
             ])
+            ->filtersLayout(FiltersLayout::AboveContent)
             ->defaultSort('id', 'desc')
             ->recordActions([
-                EditAction::make(),
+                ViewAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -145,11 +186,20 @@ class EnrollmentResource extends Resource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            ScholarshipsRelationManager::class,
+            CommentsRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListEnrollments::route('/'),
-            'edit' => EditEnrollment::route('/{record}/edit'),
+            'view' => ViewEnrollment::route('/{record}'),
+            'change-course' => ChangeEnrollmentCourse::route('/{record}/change-course'),
         ];
     }
 }
