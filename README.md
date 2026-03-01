@@ -6,7 +6,7 @@
 Academico is an open-source, Lavarel-based school management platform. Its main features include course management, enrolments management, resources scheduling, reports and stats. It is primarily targeted at small and medium-sized institutions who need a simple and affordable solution to manage their school and courses.
 
 # New 2026 version (Filament-based)
-The first versions of this project were built with the awesome Backpack for Laravel framework. However, the application was entirely rewritten with Laravel Filament. No changes in the database structure has been made, so the Filament version should work as a drop-in replacement of the Backpack version, with similar features. You can still access the Backpack version in the `filament-pro` branch (a Backpack license is required). 
+The first versions of this project were built with the awesome Backpack for Laravel framework. However, the application was entirely rewritten with Laravel Filament. No changes in the database structure has been made, so the Filament version should work as a drop-in replacement of the Backpack version, with similar features. You can still access the Backpack version in the `pro` branch (but a Backpack license is required and the packages have not been updated in a long time). I strongly recommend switching to the Filament version.
 
 # Contributors welcome! ✨
 If you are using this applications and want to make some improvements for your own needs, or just willing to contribute to an open-source project, please see [this page on the wiki](https://github.com/laxsmi/academico/wiki/Development-Roadmap) for details.
@@ -90,4 +90,4 @@ The Docker setup includes an optional custom login page. This is configured via 
 - /path/to/custom-views/login.blade.php:/app/resources/views/filament/auth/login.blade.php
 ```
 
-The custom login class (`App\Filament\Auth\Login`) detects at runtime whether this Blade file is present. When the file exists (i.e. in Docker), it renders the custom layour. When absent, the standard Filament login page is shown.
+The custom login class (`App\Filament\Auth\Login`) detects at runtime whether this Blade file is present. When the file exists (i.e. in Docker), it renders the custom layout. When absent, the standard Filament login page is shown.
