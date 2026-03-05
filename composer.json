@@ -15,6 +15,7 @@
         "mailerlite/mailerlite-api-v2-php-sdk": "^0.3.2",
         "mpdf/mpdf": "^8.2",
         "phpoffice/phpword": "^1.4",
+        "sentry/sentry-laravel": "^4.21",
         "spatie/laravel-activitylog": "^4.11",
         "spatie/laravel-medialibrary": "^11.17",
         "spatie/laravel-permission": "^6.24",
