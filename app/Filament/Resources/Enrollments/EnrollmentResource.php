@@ -94,22 +94,11 @@ class EnrollmentResource extends Resource
                         TextEntry::make('course.teacher.name')
                             ->label(__('Teacher'))
                             ->placeholder('-'),
-                        TextEntry::make('result.result_name.name')
-                            ->label(__('Result'))
-                            ->placeholder('-'),
                         TextEntry::make('attendance_ratio')
                             ->label(__('Attendance'))
                             ->suffix('%')
                             ->placeholder('-'),
                     ]),
-                Section::make(__('Books'))
-                    ->schema([
-                        TextEntry::make('course.books.name')
-                            ->label(__('Books'))
-                            ->badge()
-                            ->placeholder(__('No books assigned')),
-                    ])
-                    ->collapsible(),
             ]);
     }
 

@@ -10,7 +10,6 @@ use App\Filament\Resources\Courses\CourseResource;
 use App\Filament\Resources\Enrollments\EnrollmentResource;
 use App\Filament\Resources\Leaves\LeaveResource;
 use App\Filament\Resources\Periods\PeriodResource;
-use App\Filament\Resources\Results\ResultResource;
 use App\Filament\Resources\Students\StudentResource;
 use App\Filament\Resources\Teachers\TeacherResource;
 use App\Models\Teacher;
@@ -115,7 +114,6 @@ class PanelAuthorizationTest extends TestCase
         $this->assertTrue(StudentResource::canAccess());
         $this->assertTrue(TeacherResource::canAccess());
         $this->assertTrue(PeriodResource::canAccess());
-        $this->assertTrue(ResultResource::canAccess());
         $this->assertTrue(LeaveResource::canAccess());
         $this->assertTrue(SettingsCluster::canAccess());
     }
@@ -133,7 +131,6 @@ class PanelAuthorizationTest extends TestCase
         $this->assertTrue(EnrollmentResource::canAccess());
         $this->assertTrue(StudentResource::canAccess());
         $this->assertTrue(PeriodResource::canAccess());
-        $this->assertTrue(ResultResource::canAccess());
     }
 
     public function test_secretary_cannot_access_admin_only_resources(): void
@@ -162,7 +159,6 @@ class PanelAuthorizationTest extends TestCase
         $this->assertFalse(StudentResource::canAccess());
         $this->assertFalse(TeacherResource::canAccess());
         $this->assertFalse(PeriodResource::canAccess());
-        $this->assertFalse(ResultResource::canAccess());
         $this->assertFalse(LeaveResource::canAccess());
         $this->assertFalse(SettingsCluster::canAccess());
     }
@@ -180,7 +176,6 @@ class PanelAuthorizationTest extends TestCase
         $this->assertFalse(StudentResource::canAccess());
         $this->assertFalse(TeacherResource::canAccess());
         $this->assertFalse(PeriodResource::canAccess());
-        $this->assertFalse(ResultResource::canAccess());
         $this->assertFalse(LeaveResource::canAccess());
         $this->assertFalse(SettingsCluster::canAccess());
     }
