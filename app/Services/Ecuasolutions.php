@@ -7,11 +7,14 @@ use App\Models\Book;
 use App\Models\Enrollment;
 use App\Models\Fee;
 use App\Models\Invoice;
+use App\Traits\ReportsErrors;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 
 class Ecuasolutions implements InvoicingInterface
 {
+    use ReportsErrors;
+
     public function status(): bool
     {
         // TODO : need to find another solution to ping the server before making the request
@@ -108,23 +111,31 @@ class Ecuasolutions implements InvoicingInterface
         Log::info('Sending data to accounting');
         Log::info('request sent: '.json_encode($body));
 
-        $response = $client->post(
-            uri: $serverurl,
-            options: [
-                'headers' => [
-                    'authorization' => config('invoicing.ecuasolutions.key'),
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => $body,
-                'timeout' => 8,
+        try {
+            $response = $client->post(
+                uri: $serverurl,
+                options: [
+                    'headers' => [
+                        'authorization' => config('invoicing.ecuasolutions.key'),
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => $body,
+                    'timeout' => 8,
+                ]);
+
+            if ($response->getBody()) {
+                $code = json_decode(preg_replace('/[\\x00-\\x1F\\x80-\\xFF]/', '', $response->getBody()), true, 512, JSON_THROW_ON_ERROR);
+            }
+
+            Log::info('response: '.$response->getBody());
+
+            return $code['mensaje'] ?? null;
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'Ecuasolutions::saveInvoice', [
+                'invoice_id' => $invoice->id,
             ]);
 
-        if ($response->getBody()) {
-            $code = json_decode(preg_replace('/[\\x00-\\x1F\\x80-\\xFF]/', '', $response->getBody()), true, 512, JSON_THROW_ON_ERROR);
+            return null;
         }
-
-        Log::info('response: '.$response->getBody());
-
-        return $code['mensaje'] ?? null;
     }
 }

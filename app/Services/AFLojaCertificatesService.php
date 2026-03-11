@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\CertificatesInterface;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Traits\ReportsErrors;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Mpdf\Config\ConfigVariables;
@@ -13,6 +14,8 @@ use Mpdf\Mpdf;
 
 class AFLojaCertificatesService implements CertificatesInterface
 {
+    use ReportsErrors;
+
     public function __construct()
     {
         if (config('certificates-generation.style' !== 'afloja')) {
@@ -26,32 +29,39 @@ class AFLojaCertificatesService implements CertificatesInterface
             abort(403);
         }
 
-        App::setLocale('es');
+        try {
+            App::setLocale('es');
 
-        $defaultConfig = (new ConfigVariables)->getDefaults();
-        $fontDirs = $defaultConfig['fontDir'];
+            $defaultConfig = (new ConfigVariables)->getDefaults();
+            $fontDirs = $defaultConfig['fontDir'];
 
-        $defaultFontConfig = (new FontVariables)->getDefaults();
-        $fontData = $defaultFontConfig['fontdata'];
+            $defaultFontConfig = (new FontVariables)->getDefaults();
+            $fontData = $defaultFontConfig['fontdata'];
 
-        $mpdf = new Mpdf(['mode' => 'utf-8',
-            'format' => 'a4',
-            'orientation' => 'L',
-            'margin_left' => 25,
-            'margin_right' => 25,
-            'margin_top' => 25,
-            'margin_bottom' => 25,
-            'margin_header' => 0,
-            'margin_footer' => 0,
-            'tempDir' => storage_path('temp'),
-            'fontDir' => array_merge($fontDirs, [storage_path('afloja/fonts')]),
-            'fontdata' => $fontData + ['bodoni' => ['R' => 'BOD_R.TTF',
-                'B' => 'BOD_B.TTF', ],
-                'frenchscript' => ['R' => 'FRSCRIPT.TTF'], ],
-            'default_font' => 'bodoni', ]);
+            $mpdf = new Mpdf(['mode' => 'utf-8',
+                'format' => 'a4',
+                'orientation' => 'L',
+                'margin_left' => 25,
+                'margin_right' => 25,
+                'margin_top' => 25,
+                'margin_bottom' => 25,
+                'margin_header' => 0,
+                'margin_footer' => 0,
+                'tempDir' => storage_path('temp'),
+                'fontDir' => array_merge($fontDirs, [storage_path('afloja/fonts')]),
+                'fontdata' => $fontData + ['bodoni' => ['R' => 'BOD_R.TTF',
+                    'B' => 'BOD_B.TTF', ],
+                    'frenchscript' => ['R' => 'FRSCRIPT.TTF'], ],
+                'default_font' => 'bodoni', ]);
 
-        $mpdf->WriteHTML(view('results.certificate', ['enrollment' => $enrollment])->render());
-        $mpdf->Output();
+            $mpdf->WriteHTML(view('results.certificate', ['enrollment' => $enrollment])->render());
+            $mpdf->Output();
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'AFLojaCertificatesService::exportCertificate', [
+                'enrollment_id' => $enrollment->id,
+            ]);
+            abort(500, __('An error occurred while generating the certificate.'));
+        }
     }
 
     public function exportCourseResults(Course $course)
@@ -60,32 +70,39 @@ class AFLojaCertificatesService implements CertificatesInterface
             abort(403);
         }
 
-        App::setLocale('es');
+        try {
+            App::setLocale('es');
 
-        $defaultConfig = (new ConfigVariables)->getDefaults();
-        $fontDirs = $defaultConfig['fontDir'];
+            $defaultConfig = (new ConfigVariables)->getDefaults();
+            $fontDirs = $defaultConfig['fontDir'];
 
-        $defaultFontConfig = (new FontVariables)->getDefaults();
-        $fontData = $defaultFontConfig['fontdata'];
+            $defaultFontConfig = (new FontVariables)->getDefaults();
+            $fontData = $defaultFontConfig['fontdata'];
 
-        $mpdf = new Mpdf(['mode' => 'utf-8',
-            'format' => 'a4',
-            'orientation' => 'L',
-            'margin_left' => 25,
-            'margin_right' => 25,
-            'margin_top' => 25,
-            'margin_bottom' => 25,
-            'margin_header' => 0,
-            'margin_footer' => 0,
-            'tempDir' => storage_path('temp'),
-            'fontDir' => array_merge($fontDirs, [storage_path('afloja/fonts')]),
-            'fontdata' => $fontData + ['calibri' => ['R' => 'calibri.ttf',
-                'B' => 'calibrib.ttf', ]],
-            'default_font' => 'calibri', ]);
+            $mpdf = new Mpdf(['mode' => 'utf-8',
+                'format' => 'a4',
+                'orientation' => 'L',
+                'margin_left' => 25,
+                'margin_right' => 25,
+                'margin_top' => 25,
+                'margin_bottom' => 25,
+                'margin_header' => 0,
+                'margin_footer' => 0,
+                'tempDir' => storage_path('temp'),
+                'fontDir' => array_merge($fontDirs, [storage_path('afloja/fonts')]),
+                'fontdata' => $fontData + ['calibri' => ['R' => 'calibri.ttf',
+                    'B' => 'calibrib.ttf', ]],
+                'default_font' => 'calibri', ]);
 
-        $mpdf->WriteHTML(view('results.course-export', ['enrollments' => $course->enrollments()->with('grades')->get(),
-            'course' => $course, ])->render());
-        $mpdf->Output();
+            $mpdf->WriteHTML(view('results.course-export', ['enrollments' => $course->enrollments()->with('grades')->get(),
+                'course' => $course, ])->render());
+            $mpdf->Output();
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'AFLojaCertificatesService::exportCourseResults', [
+                'course_id' => $course->id,
+            ]);
+            abort(500, __('An error occurred while generating the results export.'));
+        }
     }
 
     public function exportResult(Enrollment $enrollment)
@@ -94,31 +111,38 @@ class AFLojaCertificatesService implements CertificatesInterface
             abort(403);
         }
 
-        App::setLocale('es');
+        try {
+            App::setLocale('es');
 
-        $defaultConfig = (new ConfigVariables)->getDefaults();
-        $fontDirs = $defaultConfig['fontDir'];
+            $defaultConfig = (new ConfigVariables)->getDefaults();
+            $fontDirs = $defaultConfig['fontDir'];
 
-        $defaultFontConfig = (new FontVariables)->getDefaults();
-        $fontData = $defaultFontConfig['fontdata'];
+            $defaultFontConfig = (new FontVariables)->getDefaults();
+            $fontData = $defaultFontConfig['fontdata'];
 
-        $mpdf = new Mpdf(['mode' => 'utf-8',
-            'format' => 'a4',
-            'orientation' => 'P',
-            'margin_left' => 25,
-            'margin_right' => 25,
-            'margin_top' => 25,
-            'margin_bottom' => 25,
-            'margin_header' => 0,
-            'margin_footer' => 0,
-            'tempDir' => storage_path('temp'),
-            'fontDir' => array_merge($fontDirs, [storage_path('afloja/fonts')]),
-            'fontdata' => $fontData + ['calibri' => ['R' => 'calibri.ttf',
-                'B' => 'calibrib.ttf', ]],
-            'default_font' => 'calibri', ]);
+            $mpdf = new Mpdf(['mode' => 'utf-8',
+                'format' => 'a4',
+                'orientation' => 'P',
+                'margin_left' => 25,
+                'margin_right' => 25,
+                'margin_top' => 25,
+                'margin_bottom' => 25,
+                'margin_header' => 0,
+                'margin_footer' => 0,
+                'tempDir' => storage_path('temp'),
+                'fontDir' => array_merge($fontDirs, [storage_path('afloja/fonts')]),
+                'fontdata' => $fontData + ['calibri' => ['R' => 'calibri.ttf',
+                    'B' => 'calibrib.ttf', ]],
+                'default_font' => 'calibri', ]);
 
-        $mpdf->WriteHTML(view('results.export', ['grades' => $enrollment->grades,
-            'enrollment' => $enrollment, ])->render());
-        $mpdf->Output();
+            $mpdf->WriteHTML(view('results.export', ['grades' => $enrollment->grades,
+                'enrollment' => $enrollment, ])->render());
+            $mpdf->Output();
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'AFLojaCertificatesService::exportResult', [
+                'enrollment_id' => $enrollment->id,
+            ]);
+            abort(500, __('An error occurred while generating the result export.'));
+        }
     }
 }

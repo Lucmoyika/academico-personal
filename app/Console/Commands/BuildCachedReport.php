@@ -5,11 +5,14 @@ namespace App\Console\Commands;
 use App\Models\Config;
 use App\Models\Period;
 use App\Services\ReportService;
+use App\Traits\ReportsErrors;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class BuildCachedReport extends Command
 {
+    use ReportsErrors;
+
     protected $signature = 'academico:build-report';
 
     protected $description = 'Iterate over all periods and update the cached data to display in reports';
@@ -23,14 +26,22 @@ class BuildCachedReport extends Command
     public function handle(): int
     {
         $this->info('Building cached report data...');
-        DB::table('cached_reports')->truncate();
 
-        $startperiod = Period::find(Config::where('name', 'first_period')->first()->value);
+        try {
+            DB::table('cached_reports')->truncate();
 
-        $this->reportService->buildInternalCoursesReport($startperiod);
+            $startperiod = Period::find(Config::where('name', 'first_period')->first()->value);
 
-        $this->info('Done!');
+            $this->reportService->buildInternalCoursesReport($startperiod);
 
-        return Command::SUCCESS;
+            $this->info('Done!');
+
+            return Command::SUCCESS;
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'BuildCachedReport::handle');
+            $this->error('Failed: '.$e->getMessage());
+
+            return Command::FAILURE;
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Invoice;
 use App\Services\InvoiceService;
+use App\Traits\ReportsErrors;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,7 +18,7 @@ use ZipArchive;
 
 class BuildInvoicesZip implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, ReportsErrors, SerializesModels;
 
     public $timeout = 500;
 
@@ -39,34 +40,43 @@ class BuildInvoicesZip implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
-        $folder = Uuid::uuid4()->toString();
+        try {
+            $folder = Uuid::uuid4()->toString();
 
-        File::makeDirectory(storage_path($folder));
+            File::makeDirectory(storage_path($folder));
 
-        $invoiceService = App::make(InvoiceService::class);
+            $invoiceService = App::make(InvoiceService::class);
 
-        foreach ($this->entries as $key => $id) {
-            if ($entry = Invoice::find($id)) {
-                $invoiceService
-                    ->download(invoice: $entry)
-                    ->filename($folder.DIRECTORY_SEPARATOR.$entry->invoice_number)
-                    ->save();
+            foreach ($this->entries as $key => $id) {
+                if ($entry = Invoice::find($id)) {
+                    $invoiceService
+                        ->download(invoice: $entry)
+                        ->filename($folder.DIRECTORY_SEPARATOR.$entry->invoice_number)
+                        ->save();
+                }
             }
-        }
 
-        $zip = new ZipArchive;
-        $files = File::files(storage_path('app'.DIRECTORY_SEPARATOR.$folder));
-        if ($zip->open(storage_path($folder.'.zip'), ZipArchive::CREATE) == true) {
-            foreach ($files as $file) {
-                $relativeName = basename($file);
-                $zip->addFile(filepath: $file, entryname: $relativeName);
+            $zip = new ZipArchive;
+            $files = File::files(storage_path('app'.DIRECTORY_SEPARATOR.$folder));
+            if ($zip->open(storage_path($folder.'.zip'), ZipArchive::CREATE) == true) {
+                foreach ($files as $file) {
+                    $relativeName = basename($file);
+                    $zip->addFile(filepath: $file, entryname: $relativeName);
+                }
             }
+            $zip->close();
+
+            $invoiceService->sendFileByEmail(filename: $folder.'.zip', email: $this->email);
+
+            File::deleteDirectory(storage_path($folder));
+            File::deleteDirectory(storage_path('app'.DIRECTORY_SEPARATOR.$folder));
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'BuildInvoicesZip::handle', [
+                'email' => $this->email,
+                'entries_count' => count($this->entries),
+            ]);
+
+            throw $e;
         }
-        $zip->close();
-
-        $invoiceService->sendFileByEmail(filename: $folder.'.zip', email: $this->email);
-
-        File::deleteDirectory(storage_path($folder));
-        File::deleteDirectory(storage_path('app'.DIRECTORY_SEPARATOR.$folder));
     }
 }

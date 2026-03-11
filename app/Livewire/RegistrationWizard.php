@@ -9,7 +9,9 @@ use App\Models\PhoneNumber;
 use App\Models\Profession;
 use App\Models\Student;
 use App\Models\User;
+use App\Traits\ReportsErrors;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
@@ -18,6 +20,7 @@ use Livewire\WithFileUploads;
 
 class RegistrationWizard extends Component
 {
+    use ReportsErrors;
     use WithFileUploads;
 
     public int $currentStep = 1;
@@ -160,93 +163,110 @@ class RegistrationWizard extends Component
 
         Log::info('Starting student registration process');
 
-        // 1. Create User
-        $username = User::where('email', $this->email)->exists()
-            ? $this->generateUsername($this->firstname.' '.$this->lastname)
-            : $this->email;
+        try {
+            $user = DB::transaction(function () {
+                // 1. Create User
+                $username = User::where('email', $this->email)->exists()
+                    ? $this->generateUsername($this->firstname.' '.$this->lastname)
+                    : $this->email;
 
-        $user = User::create([
-            'firstname' => $this->firstname,
-            'lastname' => $this->lastname,
-            'email' => $this->email,
-            'username' => $username,
-            'password' => Hash::make($this->password),
-        ]);
-
-        Log::info('New user created with ID '.$user->id);
-
-        // 2. Create Student
-        $student = Student::create([
-            'id' => $user->id,
-            'idnumber' => $this->idnumber,
-            'gender_id' => $this->gender,
-            'birthdate' => Carbon::parse($this->birthdate)->toDateString(),
-            'address' => $this->address,
-        ]);
-
-        Log::info('New student created with ID '.$student->id);
-
-        // 3. Phone numbers
-        foreach ($this->phonenumbers as $number) {
-            if (! empty(trim($number))) {
-                PhoneNumber::create([
-                    'phoneable_id' => $student->id,
-                    'phoneable_type' => Student::class,
-                    'phone_number' => $number,
+                $user = User::create([
+                    'firstname' => $this->firstname,
+                    'lastname' => $this->lastname,
+                    'email' => $this->email,
+                    'username' => $username,
+                    'password' => Hash::make($this->password),
                 ]);
-            }
-        }
 
-        // 4. Profession & Institution
-        if (! empty($this->profession)) {
-            $profession = Profession::firstOrCreate(['name' => $this->profession]);
-            $student->update(['profession_id' => $profession->id]);
-        }
+                Log::info('New user created with ID '.$user->id);
 
-        if (! empty($this->institution)) {
-            $institution = Institution::firstOrCreate(['name' => $this->institution]);
-            $student->update(['institution_id' => $institution->id]);
-        }
+                // 2. Create Student
+                $student = Student::create([
+                    'id' => $user->id,
+                    'idnumber' => $this->idnumber,
+                    'gender_id' => $this->gender,
+                    'birthdate' => Carbon::parse($this->birthdate)->toDateString(),
+                    'address' => $this->address,
+                ]);
 
-        // 5. Profile picture
-        if ($this->photo && $this->pictureAllowed) {
-            $student
-                ->addMedia($this->photo->getRealPath())
-                ->usingFileName('profilePicture.jpg')
-                ->toMediaCollection('profile-picture');
-            Log::info('Profile picture added to student profile');
-        }
+                Log::info('New student created with ID '.$student->id);
 
-        // 6. Contacts
-        foreach ($this->contacts as $contactData) {
-            $contact = Contact::create([
-                'student_id' => $student->id,
-                'firstname' => $contactData['firstname'],
-                'lastname' => $contactData['lastname'],
-                'idnumber' => $contactData['idnumber'] ?? '',
-                'address' => $contactData['address'] ?? '',
-                'email' => $contactData['email'],
-            ]);
+                // 3. Phone numbers
+                foreach ($this->phonenumbers as $number) {
+                    if (! empty(trim($number))) {
+                        PhoneNumber::create([
+                            'phoneable_id' => $student->id,
+                            'phoneable_type' => Student::class,
+                            'phone_number' => $number,
+                        ]);
+                    }
+                }
 
-            foreach ($contactData['phonenumbers'] ?? [] as $number) {
-                if (! empty(trim($number))) {
-                    PhoneNumber::create([
-                        'phoneable_id' => $contact->id,
-                        'phoneable_type' => Contact::class,
-                        'phone_number' => $number,
+                // 4. Profession & Institution
+                if (! empty($this->profession)) {
+                    $profession = Profession::firstOrCreate(['name' => $this->profession]);
+                    $student->update(['profession_id' => $profession->id]);
+                }
+
+                if (! empty($this->institution)) {
+                    $institution = Institution::firstOrCreate(['name' => $this->institution]);
+                    $student->update(['institution_id' => $institution->id]);
+                }
+
+                // 5. Profile picture (non-fatal)
+                try {
+                    if ($this->photo && $this->pictureAllowed) {
+                        $student
+                            ->addMedia($this->photo->getRealPath())
+                            ->usingFileName('profilePicture.jpg')
+                            ->toMediaCollection('profile-picture');
+                        Log::info('Profile picture added to student profile');
+                    }
+                } catch (\Throwable $e) {
+                    $this->reportError($e, 'RegistrationWizard::register.photo', [
+                        'student_id' => $student->id,
                     ]);
                 }
-            }
+
+                // 6. Contacts
+                foreach ($this->contacts as $contactData) {
+                    $contact = Contact::create([
+                        'student_id' => $student->id,
+                        'firstname' => $contactData['firstname'],
+                        'lastname' => $contactData['lastname'],
+                        'idnumber' => $contactData['idnumber'] ?? '',
+                        'address' => $contactData['address'] ?? '',
+                        'email' => $contactData['email'],
+                    ]);
+
+                    foreach ($contactData['phonenumbers'] ?? [] as $number) {
+                        if (! empty(trim($number))) {
+                            PhoneNumber::create([
+                                'phoneable_id' => $contact->id,
+                                'phoneable_type' => Contact::class,
+                                'phone_number' => $number,
+                            ]);
+                        }
+                    }
+                }
+
+                return $user;
+            });
+
+            Log::info('Registration completed for student ID '.$user->id);
+
+            auth()->login($user);
+
+            event(new UserCreated($user));
+
+            $this->registered = true;
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'RegistrationWizard::register', [
+                'email' => $this->email,
+            ]);
+
+            session()->flash('error', __('An error occurred during registration. Please try again.'));
         }
-
-        Log::info('Registration completed for student ID '.$student->id);
-
-        // Log the user in
-        auth()->login($user);
-
-        event(new UserCreated($user));
-
-        $this->registered = true;
     }
 
     protected function validateCurrentStep(): void

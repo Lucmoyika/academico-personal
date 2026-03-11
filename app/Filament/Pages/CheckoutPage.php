@@ -15,6 +15,7 @@ use App\Models\Payment;
 use App\Models\Paymentmethod;
 use App\Models\ScheduledPayment;
 use App\Models\Tax;
+use App\Traits\ReportsErrors;
 use BackedEnum;
 use Carbon\Carbon;
 use Filament\Actions\Action as PageAction;
@@ -32,10 +33,13 @@ use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
 class CheckoutPage extends Page
 {
+    use ReportsErrors;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingCart;
 
     protected static ?int $navigationSort = 4;
@@ -591,90 +595,116 @@ class CheckoutPage extends Page
     {
         $data = $this->data;
 
-        // 1. Create the Invoice
-        $invoice = Invoice::create([
-            'client_name' => $data['client_name'],
-            'client_idnumber' => $data['client_idnumber'] ?? null,
-            'client_address' => $data['client_address'] ?? null,
-            'client_email' => $data['client_email'] ?? null,
-            'client_phone' => $data['client_phone'] ?? null,
-            'invoice_type_id' => $data['invoice_type_id'],
-            'receipt_number' => $data['receipt_number'] ?? null,
-            'date' => Carbon::parse($data['date']),
-        ]);
+        try {
+            $invoice = DB::transaction(function () use ($data) {
+                // 1. Create the Invoice
+                $invoice = Invoice::create([
+                    'client_name' => $data['client_name'],
+                    'client_idnumber' => $data['client_idnumber'] ?? null,
+                    'client_address' => $data['client_address'] ?? null,
+                    'client_email' => $data['client_email'] ?? null,
+                    'client_phone' => $data['client_phone'] ?? null,
+                    'invoice_type_id' => $data['invoice_type_id'],
+                    'receipt_number' => $data['receipt_number'] ?? null,
+                    'date' => Carbon::parse($data['date']),
+                ]);
 
-        $invoice->setNumber();
+                $invoice->setNumber();
 
-        // 2. Create InvoiceDetails for each product
-        foreach ($data['products'] as $product) {
-            $price = (float) ($product['price'] ?? 0);
-            $priceInCents = (int) round($price * 100);
+                // 2. Create InvoiceDetails for each product
+                foreach ($data['products'] as $product) {
+                    $price = (float) ($product['price'] ?? 0);
+                    $priceInCents = (int) round($price * 100);
 
-            InvoiceDetail::create([
-                'invoice_id' => $invoice->id,
-                'product_name' => $product['product_name'],
-                'product_code' => $product['product_code'] ?? null,
-                'product_id' => $product['product_id'] ?? null,
-                'product_type' => $product['product_type'] ?? null,
-                'price' => $price,
-                'final_price' => $priceInCents,
-                'quantity' => $product['quantity'] ?? 1,
-                'comment' => $product['comment'] ?? null,
-            ]);
-        }
+                    InvoiceDetail::create([
+                        'invoice_id' => $invoice->id,
+                        'product_name' => $product['product_name'],
+                        'product_code' => $product['product_code'] ?? null,
+                        'product_id' => $product['product_id'] ?? null,
+                        'product_type' => $product['product_type'] ?? null,
+                        'price' => $price,
+                        'final_price' => $priceInCents,
+                        'quantity' => $product['quantity'] ?? 1,
+                        'comment' => $product['comment'] ?? null,
+                    ]);
+                }
 
-        // 3. Create Payment records
-        foreach ($data['payments'] ?? [] as $payment) {
-            if (empty($payment['value']) || $payment['value'] <= 0) {
-                continue;
-            }
-
-            Payment::create([
-                'responsable_id' => Auth::id(),
-                'invoice_id' => $invoice->id,
-                'payment_method' => $payment['payment_method'] ?? null,
-                'value' => $payment['value'],
-                'date' => $payment['date'] ? Carbon::parse($payment['date']) : now(),
-            ]);
-        }
-
-        // 4. Optional external accounting
-        if (! empty($data['send_to_accounting']) && config('invoicing.accounting_enabled')) {
-            $invoicingSystem = config('invoicing.invoicing_system');
-            $serviceClass = config("invoicing.{$invoicingSystem}.class");
-            if ($serviceClass) {
-                $service = app($serviceClass);
-                if ($service instanceof InvoicingInterface) {
-                    $result = $service->saveInvoice($invoice);
-                    if ($result && $result !== 'ok') {
-                        $invoice->update(['receipt_number' => $result]);
+                // 3. Create Payment records
+                foreach ($data['payments'] ?? [] as $payment) {
+                    if (empty($payment['value']) || $payment['value'] <= 0) {
+                        continue;
                     }
+
+                    Payment::create([
+                        'responsable_id' => Auth::id(),
+                        'invoice_id' => $invoice->id,
+                        'payment_method' => $payment['payment_method'] ?? null,
+                        'value' => $payment['value'],
+                        'date' => $payment['date'] ? Carbon::parse($payment['date']) : now(),
+                    ]);
+                }
+
+                // 5. Optional comment
+                if (! empty($data['invoice_comment'])) {
+                    Comment::create([
+                        'body' => $data['invoice_comment'],
+                        'commentable_id' => $invoice->id,
+                        'commentable_type' => Invoice::class,
+                        'author_id' => Auth::id(),
+                    ]);
+                }
+
+                // 6. Mark products as paid if invoice is fully paid
+                $this->markPaidProductsIfFullyPaid($invoice);
+
+                return $invoice;
+            });
+
+            // 4. Optional external accounting (outside transaction so it doesn't rollback the invoice)
+            if (! empty($data['send_to_accounting']) && config('invoicing.accounting_enabled')) {
+                try {
+                    $invoicingSystem = config('invoicing.invoicing_system');
+                    $serviceClass = config("invoicing.{$invoicingSystem}.class");
+                    if ($serviceClass) {
+                        $service = app($serviceClass);
+                        if ($service instanceof InvoicingInterface) {
+                            $result = $service->saveInvoice($invoice);
+                            if ($result && $result !== 'ok') {
+                                $invoice->update(['receipt_number' => $result]);
+                            }
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    $this->reportError($e, 'CheckoutPage::submit.accounting', [
+                        'invoice_id' => $invoice->id,
+                    ]);
+
+                    Notification::make()
+                        ->title(__('Invoice created but external accounting failed'))
+                        ->warning()
+                        ->send();
                 }
             }
-        }
 
-        // 5. Optional comment
-        if (! empty($data['invoice_comment'])) {
-            Comment::create([
-                'body' => $data['invoice_comment'],
-                'commentable_id' => $invoice->id,
-                'commentable_type' => Invoice::class,
-                'author_id' => Auth::id(),
+            Notification::make()
+                ->title(__('Invoice created successfully'))
+                ->success()
+                ->send();
+
+            if ($this->enrollment) {
+                $this->redirect(route('filament.admin.resources.enrollments.view', $this->enrollment));
+            } else {
+                $this->redirect(route('filament.admin.resources.invoices.view', $invoice));
+            }
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'CheckoutPage::submit', [
+                'enrollment_id' => $this->enrollment?->id,
             ]);
-        }
 
-        // 6. Mark products as paid if invoice is fully paid
-        $this->markPaidProductsIfFullyPaid($invoice);
-
-        Notification::make()
-            ->title(__('Invoice created successfully'))
-            ->success()
-            ->send();
-
-        if ($this->enrollment) {
-            $this->redirect(route('filament.admin.resources.enrollments.view', $this->enrollment));
-        } else {
-            $this->redirect(route('filament.admin.resources.invoices.view', $invoice));
+            Notification::make()
+                ->title(__('An error occurred while creating the invoice.'))
+                ->danger()
+                ->send();
         }
     }
 

@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Interfaces\MailingSystemInterface;
+use App\Traits\ReportsErrors;
 use MailerLiteApi\Api\Groups;
 use MailerLiteApi\Api\Subscribers;
 use MailerLiteApi\MailerLite;
 
 class MailerliteService implements MailingSystemInterface
 {
+    use ReportsErrors;
+
     public Groups $groupsApi;
 
     public Subscribers $subscribersApi;
@@ -23,22 +26,29 @@ class MailerliteService implements MailingSystemInterface
 
     public function subscribeUser($email, $name, $lastname, $listId): void
     {
-        $subscriberGroups = $this->subscribersApi->getGroups($email); // returns array of group objects subscriber belongs to
+        try {
+            $subscriberGroups = $this->subscribersApi->getGroups($email); // returns array of group objects subscriber belongs to
 
-        foreach ($subscriberGroups as $group) {
-            $groupId = $array = json_decode(json_encode($group, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
-            $this->groupsApi->removeSubscriber($groupId['id'], $email); // returns empty response
+            foreach ($subscriberGroups as $group) {
+                $groupId = $array = json_decode(json_encode($group, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+                $this->groupsApi->removeSubscriber($groupId['id'], $email); // returns empty response
+            }
+
+            $subscriber = [
+                'email' => $email,
+                'name' => $name,
+                'fields' => [
+                    'lastname' => $lastname,
+                ],
+            ];
+
+            $this->groupsApi->addSubscriber($listId, $subscriber); // returns added subscriber
+        } catch (\Throwable $e) {
+            $this->reportError($e, 'MailerliteService::subscribeUser', [
+                'email' => $email,
+                'list_id' => $listId,
+            ]);
         }
-
-        $subscriber = [
-            'email' => $email,
-            'name' => $name,
-            'fields' => [
-                'lastname' => $lastname,
-            ],
-        ];
-
-        $this->groupsApi->addSubscriber($listId, $subscriber); // returns added subscriber
     }
 
     public function unsubscribeUser(string $email, $listId): void

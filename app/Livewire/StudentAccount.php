@@ -7,6 +7,7 @@ use App\Models\Institution;
 use App\Models\PhoneNumber;
 use App\Models\Profession;
 use App\Models\Student;
+use App\Traits\ReportsErrors;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -15,6 +16,7 @@ use Livewire\WithFileUploads;
 
 class StudentAccount extends Component
 {
+    use ReportsErrors;
     use WithFileUploads;
 
     public string $activeTab = 'account';
@@ -249,17 +251,26 @@ class StudentAccount extends Component
         ]);
 
         if ($this->photo) {
-            $student = auth()->user()->student;
-            $student->clearMediaCollection('profile-picture');
-            $student
-                ->addMedia($this->photo->getRealPath())
-                ->usingFileName('profilePicture.jpg')
-                ->toMediaCollection('profile-picture');
+            try {
+                $student = auth()->user()->student;
+                $student->clearMediaCollection('profile-picture');
+                $student
+                    ->addMedia($this->photo->getRealPath())
+                    ->usingFileName('profilePicture.jpg')
+                    ->toMediaCollection('profile-picture');
 
-            $this->currentPhotoUrl = $student->getFirstMediaUrl('profile-picture', 'thumb');
-            $this->photo = null;
+                $this->currentPhotoUrl = $student->getFirstMediaUrl('profile-picture', 'thumb');
+                $this->photo = null;
 
-            Log::info('User updated their profile picture');
+                Log::info('User updated their profile picture');
+            } catch (\Throwable $e) {
+                $this->reportError($e, 'StudentAccount::savePhoto', [
+                    'user_id' => auth()->id(),
+                ]);
+                $this->message = __('An error occurred while saving your photo.');
+
+                return;
+            }
         }
 
         $this->advanceForceUpdate(6, 7);

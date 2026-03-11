@@ -13,6 +13,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRecords;
+use Illuminate\Support\Facades\Log;
 use League\Csv\Reader;
 
 class ManageSkills extends ManageRecords
@@ -41,6 +42,16 @@ class ManageSkills extends ManageRecords
                     try {
                         $csv = Reader::createFromPath($filePath);
                     } catch (\Exception $e) {
+                        Log::error('[ManageSkills::importCsv] Failed to read CSV file', [
+                            'exception' => $e::class,
+                            'message' => $e->getMessage(),
+                            'file_path' => $filePath,
+                        ]);
+
+                        if (function_exists('\Sentry\captureException')) {
+                            \Sentry\captureException($e);
+                        }
+
                         Notification::make()->danger()->title(__('Invalid file.'))->send();
 
                         return;
@@ -79,28 +90,43 @@ class ManageSkills extends ManageRecords
                         $group = EvaluationType::create(['name' => $data['group']]);
                     }
 
-                    $count = 0;
-                    foreach ($csv as $record) {
-                        $values = array_values($record);
-                        $skillType = SkillType::firstWhere(['shortname' => $values[0]]) ?? SkillType::firstWhere(['name' => $values[0]]);
-                        $level = Level::firstWhere(['name' => $values[2]]);
+                    try {
+                        $count = 0;
+                        foreach ($csv as $record) {
+                            $values = array_values($record);
+                            $skillType = SkillType::firstWhere(['shortname' => $values[0]]) ?? SkillType::firstWhere(['name' => $values[0]]);
+                            $level = Level::firstWhere(['name' => $values[2]]);
 
-                        $skill = Skill::create([
-                            'skill_type_id' => $skillType->id,
-                            'name' => $values[1],
-                            'level_id' => $level->id,
-                        ]);
+                            $skill = Skill::create([
+                                'skill_type_id' => $skillType->id,
+                                'name' => $values[1],
+                                'level_id' => $level->id,
+                            ]);
 
-                        if ($group) {
-                            $group->skills()->save($skill);
+                            if ($group) {
+                                $group->skills()->save($skill);
+                            }
+
+                            $count++;
                         }
 
-                        $count++;
+                        @unlink($filePath);
+
+                        Notification::make()->success()->title(__(':count skills imported.', ['count' => $count]))->send();
+                    } catch (\Throwable $e) {
+                        Log::error('[ManageSkills::importCsv] Failed during skill import', [
+                            'exception' => $e::class,
+                            'message' => $e->getMessage(),
+                        ]);
+
+                        if (function_exists('\Sentry\captureException')) {
+                            \Sentry\captureException($e);
+                        }
+
+                        @unlink($filePath);
+
+                        Notification::make()->danger()->title(__('An error occurred during import.'))->send();
                     }
-
-                    @unlink($filePath);
-
-                    Notification::make()->success()->title(__(':count skills imported.', ['count' => $count]))->send();
                 }),
         ];
     }

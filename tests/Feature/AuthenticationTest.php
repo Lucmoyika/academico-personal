@@ -59,10 +59,10 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_homepage_is_accessible(): void
+    public function test_homepage_redirects_guests_to_login(): void
     {
         $response = $this->get('/');
-        $response->assertStatus(200);
+        $response->assertRedirect();
     }
 
     public function test_admin_panel_requires_authentication(): void
