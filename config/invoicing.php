@@ -20,6 +20,7 @@ return [
     'ecuasolutions' => [
         'class' => Ecuasolutions::class,
         'url' => env('ECUASOLUTIONS_URL'),
+        'ping_url' => env('ECUASOLUTIONS_PING_URL'),
         'key' => env('ECUASOLUTIONS_KEY'),
     ],
 

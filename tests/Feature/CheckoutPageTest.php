@@ -13,6 +13,7 @@ use App\Models\Student;
 use App\Models\User;
 use App\Models\Year;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -176,5 +177,121 @@ class CheckoutPageTest extends TestCase
         $this->get(route('filament.admin.resources.enrollments.view', $this->enrollment))
             ->assertSuccessful()
             ->assertDontSee(__('Checkout enrollment'));
+    }
+
+    public function test_accounting_called_when_toggle_on(): void
+    {
+        config(['invoicing.invoicing_system' => 'ecuasolutions']);
+        config(['invoicing.ecuasolutions.url' => 'https://mock-accounting.test/api']);
+        config(['invoicing.ecuasolutions.ping_url' => 'https://mock-accounting.test/ping']);
+        config(['invoicing.ecuasolutions.key' => 'test-key']);
+
+        Http::fake([
+            'mock-accounting.test/*' => Http::response(['mensaje' => 'REC-001'], 200),
+        ]);
+
+        $component = Livewire::withQueryParams(['enrollment_id' => $this->enrollment->id])
+            ->test(CheckoutPage::class);
+
+        $component->set('data.products', [
+            [
+                'product_name' => $this->course->name,
+                'product_code' => 'COURSE01',
+                'product_type' => Enrollment::class,
+                'product_id' => $this->enrollment->id,
+                'price' => 100,
+                'quantity' => 1,
+                'comment' => '',
+            ],
+        ]);
+
+        $component->set('data.payments', [
+            ['payment_method' => $this->paymentMethod->code, 'value' => 100, 'date' => now()->format('Y-m-d')],
+        ]);
+
+        $component->set('data.client_name', 'Test Client');
+        $component->set('data.client_idnumber', '1234567890');
+        $component->set('data.invoice_type_id', $this->invoiceType->id);
+        $component->set('data.date', now()->format('Y-m-d'));
+        $component->set('data.send_to_accounting', true);
+
+        $component->call('submit');
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'mock-accounting.test/api'));
+        $this->assertDatabaseHas('invoices', ['receipt_number' => 'REC-001']);
+    }
+
+    public function test_accounting_not_called_when_toggle_off(): void
+    {
+        config(['invoicing.invoicing_system' => 'ecuasolutions']);
+        config(['invoicing.ecuasolutions.url' => 'https://mock-accounting.test/api']);
+        config(['invoicing.ecuasolutions.ping_url' => 'https://mock-accounting.test/ping']);
+        config(['invoicing.ecuasolutions.key' => 'test-key']);
+
+        Http::fake();
+
+        $component = Livewire::withQueryParams(['enrollment_id' => $this->enrollment->id])
+            ->test(CheckoutPage::class);
+
+        $component->set('data.products', [
+            [
+                'product_name' => $this->course->name,
+                'product_code' => '',
+                'product_type' => Enrollment::class,
+                'product_id' => $this->enrollment->id,
+                'price' => 100,
+                'quantity' => 1,
+                'comment' => '',
+            ],
+        ]);
+
+        $component->set('data.payments', [
+            ['payment_method' => $this->paymentMethod->code, 'value' => 100, 'date' => now()->format('Y-m-d')],
+        ]);
+
+        $component->set('data.client_name', 'Test Client');
+        $component->set('data.invoice_type_id', $this->invoiceType->id);
+        $component->set('data.date', now()->format('Y-m-d'));
+        $component->set('data.send_to_accounting', false);
+
+        $component->call('submit');
+
+        Http::assertNothingSent();
+        $this->assertDatabaseCount('invoices', 1);
+    }
+
+    public function test_accounting_not_called_when_internal_system(): void
+    {
+        config(['invoicing.invoicing_system' => 'internal']);
+
+        Http::fake();
+
+        $component = Livewire::withQueryParams(['enrollment_id' => $this->enrollment->id])
+            ->test(CheckoutPage::class);
+
+        $component->set('data.products', [
+            [
+                'product_name' => $this->course->name,
+                'product_code' => '',
+                'product_type' => Enrollment::class,
+                'product_id' => $this->enrollment->id,
+                'price' => 100,
+                'quantity' => 1,
+                'comment' => '',
+            ],
+        ]);
+
+        $component->set('data.payments', [
+            ['payment_method' => $this->paymentMethod->code, 'value' => 100, 'date' => now()->format('Y-m-d')],
+        ]);
+
+        $component->set('data.client_name', 'Test Client');
+        $component->set('data.invoice_type_id', $this->invoiceType->id);
+        $component->set('data.date', now()->format('Y-m-d'));
+
+        $component->call('submit');
+
+        Http::assertNothingSent();
+        $this->assertDatabaseCount('invoices', 1);
     }
 }

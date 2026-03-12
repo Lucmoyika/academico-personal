@@ -3,12 +3,10 @@
 namespace App\Services;
 
 use App\Interfaces\InvoicingInterface;
-use App\Models\Book;
 use App\Models\Enrollment;
-use App\Models\Fee;
 use App\Models\Invoice;
 use App\Traits\ReportsErrors;
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class Ecuasolutions implements InvoicingInterface
@@ -17,12 +15,32 @@ class Ecuasolutions implements InvoicingInterface
 
     public function status(): bool
     {
-        // TODO : need to find another solution to ping the server before making the request
-        return true;
+        $pingUrl = config('invoicing.ecuasolutions.ping_url');
+
+        if (empty($pingUrl)) {
+            return false;
+        }
+
+        try {
+            Http::timeout(3)->get($pingUrl);
+
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     public function saveInvoice(Invoice $invoice): ?string
     {
+        $url = config('invoicing.ecuasolutions.url');
+        $key = config('invoicing.ecuasolutions.key');
+
+        if (empty($url) || empty($key)) {
+            Log::warning('Ecuasolutions: URL or key not configured, skipping invoice send.');
+
+            return null;
+        }
+
         $ivkardex = [];
         $pckardex = [];
         $notes = [];
@@ -38,18 +56,18 @@ class Ecuasolutions implements InvoicingInterface
             ];
         }
 
-        foreach ($invoice->invoiceDetails as $po => $product) {
-            if ($product->product instanceof Enrollment) {
-                $ivkardex[] = [
-                    'codinventario' => $product->product_code,
-                    'codbodega' => 'MAT',
-                    'cantidad' => 1,
-                    'descuento' => 0,
-                    'iva' => 0,
-                    'preciototal' => $product->final_price,
-                    'valoriva' => 0,
-                ];
+        foreach ($invoice->invoiceDetails as $product) {
+            $ivkardex[] = [
+                'codinventario' => $product->product_code,
+                'codbodega' => 'MAT',
+                'cantidad' => 1,
+                'descuento' => 0,
+                'iva' => 0,
+                'preciototal' => $product->final_price,
+                'valoriva' => 0,
+            ];
 
+            if ($product->product instanceof Enrollment) {
                 if ($product->product->student_name) {
                     $notes[] = 'Taller de Francés de '.$product->product->student_name;
                 }
@@ -59,39 +77,17 @@ class Ecuasolutions implements InvoicingInterface
                 if ($product->product->course?->period?->name) {
                     $notes[] = 'Ciclo: '.$product->product->course?->period?->name;
                 }
-            } elseif ($product->product instanceof Fee) {
-                $ivkardex[] = [
-                    'codinventario' => $product->product_code,
-                    'codbodega' => 'MAT',
-                    'cantidad' => 1,
-                    'descuento' => 0,
-                    'iva' => 0,
-                    'preciototal' => $product->final_price,
-                    'valoriva' => 0,
-                ];
-            } elseif ($product->product instanceof Book) {
-                $ivkardex[] = [
-                    'codinventario' => $product->product_code,
-                    'codbodega' => 'MAT',
-                    'cantidad' => 1,
-                    'descuento' => 0,
-                    'iva' => 0,
-                    'preciototal' => $product->final_price,
-                    'valoriva' => 0,
-                ];
             }
         }
 
         $body = [
             'codtrans' => 'FE',
-            // was 'OP'
             'numtrans' => $invoice->id,
             'fechatrans' => $invoice->created_at,
             'horatrans' => $invoice->created_at,
             'descripcion' => implode(' - ', $notes),
             'codusuario' => 'web',
             'codprovcli' => $invoice->client_idnumber,
-            // si existe, se busca el cliente. Si no lo creamos.
             'nombre' => $invoice->client_name,
             'direccion' => $invoice->client_address,
             'telefono' => $invoice->client_phone,
@@ -101,33 +97,29 @@ class Ecuasolutions implements InvoicingInterface
             'pckardex' => $pckardex,
         ];
 
-        $client = new Client([
-            'debug' => true,
-            'timeout' => 8,
-        ]);
-
-        $serverurl = config('invoicing.ecuasolutions.url');
-
         Log::info('Sending data to accounting');
         Log::info('request sent: '.json_encode($body));
 
-        try {
-            $response = $client->post(
-                uri: $serverurl,
-                options: [
-                    'headers' => [
-                        'authorization' => config('invoicing.ecuasolutions.key'),
-                        'Content-Type' => 'application/json',
-                    ],
-                    'json' => $body,
-                    'timeout' => 8,
-                ]);
+        $code = null;
 
-            if ($response->getBody()) {
-                $code = json_decode(preg_replace('/[\\x00-\\x1F\\x80-\\xFF]/', '', $response->getBody()), true, 512, JSON_THROW_ON_ERROR);
+        try {
+            $response = Http::retry(2, 1000)
+                ->timeout(12)
+                ->withHeaders([
+                    'authorization' => $key,
+                ])
+                ->post($url, $body);
+
+            if ($response->body()) {
+                $code = json_decode(
+                    preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $response->body()),
+                    true,
+                    512,
+                    JSON_THROW_ON_ERROR
+                );
             }
 
-            Log::info('response: '.$response->getBody());
+            Log::info('response: '.$response->body());
 
             return $code['mensaje'] ?? null;
         } catch (\Throwable $e) {
