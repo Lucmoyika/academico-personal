@@ -8,9 +8,7 @@ use App\Models\Level;
 use App\Models\Period;
 use App\Models\Rhythm;
 use BackedEnum;
-use Filament\Pages\Page;
-
-class AttendanceByLevelAndRhythmReport extends Page
+class AttendanceByLevelAndRhythmReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-bars-3';
 
@@ -43,6 +41,7 @@ class AttendanceByLevelAndRhythmReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $period = Period::get_default_period();
         $this->selectedPeriodId = $period?->id;
 

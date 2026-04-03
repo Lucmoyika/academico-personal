@@ -6,9 +6,7 @@ use App\Models\AttendanceType;
 use App\Models\Course;
 use App\Models\Period;
 use BackedEnum;
-use Filament\Pages\Page;
-
-class AttendanceForCourseReport extends Page
+class AttendanceForCourseReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
@@ -36,6 +34,7 @@ class AttendanceForCourseReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $period = Period::get_default_period();
         $this->selectedPeriodId = $period?->id;
         $this->loadCourses();

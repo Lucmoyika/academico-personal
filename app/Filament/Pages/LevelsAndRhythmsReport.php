@@ -4,9 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Period;
 use BackedEnum;
-use Filament\Pages\Page;
-
-class LevelsAndRhythmsReport extends Page
+class LevelsAndRhythmsReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
 
@@ -35,6 +33,7 @@ class LevelsAndRhythmsReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $this->selectedPeriodId = Period::get_default_period()?->id;
         $this->loadData();
     }

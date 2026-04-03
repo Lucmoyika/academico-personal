@@ -8,9 +8,7 @@ use App\Models\Course;
 use App\Models\Event;
 use App\Models\Period;
 use BackedEnum;
-use Filament\Pages\Page;
-
-class AttendanceReport extends Page
+class AttendanceReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
@@ -37,6 +35,7 @@ class AttendanceReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $period = Period::get_default_period();
         $this->selectedPeriodId = $period?->id;
 

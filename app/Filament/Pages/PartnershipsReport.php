@@ -4,9 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Partner;
 use BackedEnum;
-use Filament\Pages\Page;
-
-class PartnershipsReport extends Page
+class PartnershipsReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
@@ -24,6 +22,7 @@ class PartnershipsReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $this->partnersData = Partner::orderBy('name')
             ->withCount('courses')
             ->get()

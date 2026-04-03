@@ -6,9 +6,7 @@ use App\Models\Config;
 use App\Models\Period;
 use App\Services\StatService;
 use BackedEnum;
-use Filament\Pages\Page;
-
-class GenderReport extends Page
+class GenderReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
@@ -34,6 +32,7 @@ class GenderReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $this->allPeriods = Period::withoutGlobalScopes()
             ->orderBy('year_id')
             ->orderBy('order')

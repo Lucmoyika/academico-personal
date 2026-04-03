@@ -5,9 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\Course;
 use App\Models\Period;
 use BackedEnum;
-use Filament\Pages\Page;
-
-class CoursesReport extends Page
+class CoursesReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
@@ -30,6 +28,7 @@ class CoursesReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $period = Period::get_default_period();
         $this->selectedPeriodId = $period?->id;
         $this->loadData();

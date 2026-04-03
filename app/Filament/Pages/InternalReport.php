@@ -7,9 +7,7 @@ use App\Models\Period;
 use App\Models\Year;
 use App\Services\StatService;
 use BackedEnum;
-use Filament\Pages\Page;
-
-class InternalReport extends Page
+class InternalReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
@@ -35,6 +33,7 @@ class InternalReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $this->allPeriods = Period::withoutGlobalScopes()
             ->orderBy('year_id')
             ->orderBy('order')

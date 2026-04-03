@@ -6,9 +6,7 @@ use App\Services\DateRange;
 use App\Services\StatService;
 use BackedEnum;
 use Carbon\Carbon;
-use Filament\Pages\Page;
-
-class ExternalSummaryReport extends Page
+class ExternalSummaryReport extends ReportPage
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
 
@@ -34,6 +32,7 @@ class ExternalSummaryReport extends Page
 
     public function mount(): void
     {
+        parent::mount();
         $this->startDate = Carbon::now()->startOfYear()->format('Y-m-d');
         $this->endDate = Carbon::now()->format('Y-m-d');
         $this->loadData();
