@@ -49,7 +49,7 @@ class Payment extends Model
 
     public function getEnrollmentNameAttribute(): string
     {
-        if ($this->invoice->enrollments()->exists()) {
+        if ($this->invoice && $this->invoice->enrollments()->exists()) {
             return $this->invoice->enrollments->first()->student_name; // TODO fix this, an invoice can theoretically contain several enrollments
         }
 
