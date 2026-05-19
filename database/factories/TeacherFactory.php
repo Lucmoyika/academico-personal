@@ -15,9 +15,22 @@ class TeacherFactory extends Factory
 
     public function definition(): array
     {
+        $specialty = fake()->randomElement([
+            'Mathématiques',
+            'Physique',
+            'Informatique',
+            'Histoire',
+            'Langues',
+        ]);
+
         return [
-            'id' => User::factory(),
-            'max_week_hours' => fake()->numberBetween(10, 40),
+            'id' => User::factory()->state([
+                'firstname' => fake()->firstName(),
+                'lastname' => fake()->lastName().' - '.$specialty,
+                'email' => fake()->unique()->safeEmail(),
+            ]),
+            'hired_at' => fake()->dateTimeBetween('-15 years', '-3 months'),
+            'max_week_hours' => fake()->numberBetween(12, 35),
         ];
     }
 }

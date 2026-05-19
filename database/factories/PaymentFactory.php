@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Paymentmethod;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,8 +20,8 @@ class PaymentFactory extends Factory
         return [
             'responsable_id' => User::factory(),
             'invoice_id' => Invoice::factory(),
-            'payment_method' => null,
-            'value' => fake()->numberBetween(100, 10000),
+            'payment_method' => Paymentmethod::query()->inRandomOrder()->value('code') ?? Paymentmethod::factory()->create()->code,
+            'value' => fake()->numberBetween(5000, 30000),
             'comment' => fake()->optional()->sentence(),
         ];
     }
