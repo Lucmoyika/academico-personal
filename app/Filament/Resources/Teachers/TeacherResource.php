@@ -51,30 +51,60 @@ class TeacherResource extends Resource
         return __('Teachers');
     }
 
+    // public static function form(Form $form): Form
+    // {
+    //     return $schema
+    //         ->components([
+    //             TextInput::make('firstname')
+    //                 ->label(__('First name'))
+    //                 ->required()
+    //                 ->maxLength(255),
+    //             TextInput::make('lastname')
+    //                 ->label(__('Last name'))
+    //                 ->required()
+    //                 ->maxLength(255),
+    //             TextInput::make('email')
+    //                 ->label(__('Email'))
+    //                 ->email()
+    //                 ->required()
+    //                 ->maxLength(255),
+    //             TextInput::make('max_week_hours')
+    //                 ->label(__('Max weekly hours'))
+    //                 ->numeric()
+    //                 ->step(0.01)
+    //                 ->nullable(),
+    //             DatePicker::make('hired_at')
+    //                 ->label(__('Hire Date'))
+    //                 ->nullable(),
+    //         ]);
+    // }
+
     public static function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 TextInput::make('firstname')
                     ->label(__('First name'))
                     ->required()
                     ->maxLength(255),
+
                 TextInput::make('lastname')
                     ->label(__('Last name'))
                     ->required()
                     ->maxLength(255),
+
                 TextInput::make('email')
                     ->label(__('Email'))
                     ->email()
-                    ->required()
-                    ->maxLength(255),
+                    ->required(),
+
                 TextInput::make('max_week_hours')
-                    ->label(__('Max weekly hours'))
+                    ->label(__('Max hours'))
                     ->numeric()
-                    ->step(0.01)
                     ->nullable(),
+
                 DatePicker::make('hired_at')
-                    ->label(__('Hire Date'))
+                    ->label(__('Hired at'))
                     ->nullable(),
             ]);
     }

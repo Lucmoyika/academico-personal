@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ReferenceDataSeeder::class,
             PermissionsSeeder::class,
+            TestSeeder::class,
         ]);
 
         $admin = User::factory()->create([

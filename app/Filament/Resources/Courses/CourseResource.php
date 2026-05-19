@@ -17,13 +17,13 @@ use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -61,202 +61,276 @@ class CourseResource extends Resource
         return __('Courses');
     }
 
+    // public static function form(Form $form): Form
+    // {
+    //     return $schema
+    //         ->components([
+    //             Tabs::make('Course')
+    //                 ->columnSpanFull()
+    //                 ->tabs([
+    //                     Tab::make(__('Course info'))
+    //                         ->schema([
+    //                             Select::make('rhythm_id')
+    //                                 ->label(__('Rhythm'))
+    //                                 ->relationship('rhythm', 'name')
+    //                                 ->required()
+    //                                 ->preload()
+    //                                 ->searchable(),
+    //                             Select::make('level_id')
+    //                                 ->label(__('Level'))
+    //                                 ->relationship('level', 'name')
+    //                                 ->preload()
+    //                                 ->searchable()
+    //                                 ->nullable(),
+    //                             TextInput::make('name')
+    //                                 ->label(__('Name'))
+    //                                 ->required()
+    //                                 ->minLength(1)
+    //                                 ->maxLength(100),
+    //                             TextInput::make('price')
+    //                                 ->label(__('Price'))
+    //                                 ->required()
+    //                                 ->numeric()
+    //                                 ->minValue(0)
+    //                                 ->step(0.01)
+    //                                 ->prefix(config('academico.currency_position') === 'before' ? config('academico.currency_symbol') : null)
+    //                                 ->suffix(config('academico.currency_position') === 'after' ? config('academico.currency_symbol') : null),
+    //                             TextInput::make('price_b')
+    //                                 ->label(__('Price B'))
+    //                                 ->numeric()
+    //                                 ->minValue(0)
+    //                                 ->step(0.01)
+    //                                 ->prefix(config('academico.currency_position') === 'before' ? config('academico.currency_symbol') : null)
+    //                                 ->suffix(config('academico.currency_position') === 'after' ? config('academico.currency_symbol') : null)
+    //                                 ->visible(fn (): bool => (bool) config('invoicing.price_categories_enabled')),
+    //                             TextInput::make('price_c')
+    //                                 ->label(__('Price C'))
+    //                                 ->numeric()
+    //                                 ->minValue(0)
+    //                                 ->step(0.01)
+    //                                 ->prefix(config('academico.currency_position') === 'before' ? config('academico.currency_symbol') : null)
+    //                                 ->suffix(config('academico.currency_position') === 'after' ? config('academico.currency_symbol') : null)
+    //                                 ->visible(fn (): bool => (bool) config('invoicing.price_categories_enabled')),
+    //                             TextInput::make('volume')
+    //                                 ->label(__('Volume'))
+    //                                 ->numeric()
+    //                                 ->minValue(0)
+    //                                 ->suffix('h')
+    //                                 ->nullable(),
+    //                             TextInput::make('remote_volume')
+    //                                 ->label(__('Remote volume'))
+    //                                 ->numeric()
+    //                                 ->minValue(0)
+    //                                 ->suffix('h')
+    //                                 ->nullable(),
+    //                             TextInput::make('spots')
+    //                                 ->label(__('Spots'))
+    //                                 ->required()
+    //                                 ->integer()
+    //                                 ->minValue(0),
+    //                             Checkbox::make('exempt_attendance')
+    //                                 ->label(__('Exempt from attendance')),
+    //                             ColorPicker::make('color')
+    //                                 ->label(__('Color'))
+    //                                 ->nullable(),
+    //                         ]),
+
+    //                     Tab::make(__('Resources'))
+    //                         ->schema([
+    //                             Select::make('teacher_id')
+    //                                 ->label(__('Teacher'))
+    //                                 ->relationship('teacher', 'id')
+    //                                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
+    //                                 ->searchable()
+    //                                 ->preload()
+    //                                 ->nullable(),
+    //                             Select::make('room_id')
+    //                                 ->label(__('Room'))
+    //                                 ->relationship('room', 'name')
+    //                                 ->preload()
+    //                                 ->nullable(),
+    //                         ]),
+
+    //                     Tab::make(__('Pedagogy'))
+    //                         ->schema([
+    //                             Select::make('books')
+    //                                 ->label(__('Books'))
+    //                                 ->relationship('books', 'name')
+    //                                 ->multiple()
+    //                                 ->preload()
+    //                                 ->searchable(),
+    //                             Select::make('evaluation_type_id')
+    //                                 ->label(__('Evaluation Type'))
+    //                                 ->relationship('evaluationType', 'name')
+    //                                 ->preload()
+    //                                 ->nullable(),
+    //                             Checkbox::make('marked')
+    //                                 ->label(__('Evaluation ready'))
+    //                                 ->visibleOn('edit'),
+    //                         ]),
+
+    //                     Tab::make(__('Submodules'))
+    //                         ->schema([
+    //                             Repeater::make('children')
+    //                                 ->relationship()
+    //                                 ->label(__('Submodules'))
+    //                                 ->schema([
+    //                                     TextInput::make('name')
+    //                                         ->label(__('Name'))
+    //                                         ->required()
+    //                                         ->maxLength(100),
+    //                                     Select::make('level_id')
+    //                                         ->label(__('Level'))
+    //                                         ->relationship('level', 'name')
+    //                                         ->preload()
+    //                                         ->searchable()
+    //                                         ->nullable(),
+    //                                     TextInput::make('volume')
+    //                                         ->label(__('Volume'))
+    //                                         ->numeric()
+    //                                         ->minValue(0)
+    //                                         ->suffix('h')
+    //                                         ->nullable(),
+    //                                 ])
+    //                                 ->columns(3)
+    //                                 ->defaultItems(0)
+    //                                 ->reorderable(false)
+    //                                 ->mutateRelationshipDataBeforeCreateUsing(function (array $data, $livewire): array {
+    //                                     $parent = $livewire->getRecord();
+    //                                     $data['period_id'] = $parent->period_id;
+    //                                     $data['teacher_id'] = $parent->teacher_id;
+    //                                     $data['room_id'] = $parent->room_id;
+    //                                     $data['start_date'] = $parent->start_date;
+    //                                     $data['end_date'] = $parent->end_date;
+    //                                     $data['price'] = $parent->price;
+    //                                     $data['rhythm_id'] = $parent->rhythm_id;
+    //                                     $data['spots'] = $parent->spots;
+
+    //                                     return $data;
+    //                                 }),
+    //                         ])
+    //                         ->visibleOn('edit'),
+
+    //                     Tab::make(__('Schedule'))
+    //                         ->schema([
+    //                             TextEntry::make(__('Please be aware that if you modify the course dates, the existing attendance for this course will be lost!'))
+    //                                 ->columnSpanFull()
+    //                                 ->visibleOn('edit'),
+    //                             Select::make('period_id')
+    //                                 ->label(__('Period'))
+    //                                 ->relationship('period', 'name')
+    //                                 ->default(fn (): ?int => Period::get_default_period()?->id)
+    //                                 ->required()
+    //                                 ->preload()
+    //                                 ->searchable(),
+    //                             DatePicker::make('start_date')
+    //                                 ->label(__('Start Date'))
+    //                                 ->required(),
+    //                             DatePicker::make('end_date')
+    //                                 ->label(__('End Date'))
+    //                                 ->required(),
+    //                             Repeater::make('courseTimes')
+    //                                 ->relationship('times')
+    //                                 ->label(__('Recurring schedule'))
+    //                                 ->schema([
+    //                                     Select::make('day')
+    //                                         ->options([
+    //                                             0 => __('Sunday'),
+    //                                             1 => __('Monday'),
+    //                                             2 => __('Tuesday'),
+    //                                             3 => __('Wednesday'),
+    //                                             4 => __('Thursday'),
+    //                                             5 => __('Friday'),
+    //                                             6 => __('Saturday'),
+    //                                         ])
+    //                                         ->required(),
+    //                                     TimePicker::make('start')
+    //                                         ->required()
+    //                                         ->seconds(false),
+    //                                     TimePicker::make('end')
+    //                                         ->required()
+    //                                         ->seconds(false),
+    //                                 ])
+    //                                 ->columns(3)
+    //                                 ->defaultItems(0)
+    //                                 ->reorderable(false),
+    //                         ]),
+    //                 ]),
+    //         ]);
+    // }
+
     public static function form(Form $form): Form
     {
-        return $schema
-            ->components([
-                Tabs::make('Course')
-                    ->columnSpanFull()
-                    ->tabs([
-                        Tab::make(__('Course info'))
-                            ->schema([
-                                Select::make('rhythm_id')
-                                    ->label(__('Rhythm'))
-                                    ->relationship('rhythm', 'name')
-                                    ->required()
-                                    ->preload()
-                                    ->searchable(),
-                                Select::make('level_id')
-                                    ->label(__('Level'))
-                                    ->relationship('level', 'name')
-                                    ->preload()
-                                    ->searchable()
-                                    ->nullable(),
-                                TextInput::make('name')
-                                    ->label(__('Name'))
-                                    ->required()
-                                    ->minLength(1)
-                                    ->maxLength(100),
-                                TextInput::make('price')
-                                    ->label(__('Price'))
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->step(0.01)
-                                    ->prefix(config('academico.currency_position') === 'before' ? config('academico.currency_symbol') : null)
-                                    ->suffix(config('academico.currency_position') === 'after' ? config('academico.currency_symbol') : null),
-                                TextInput::make('price_b')
-                                    ->label(__('Price B'))
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->step(0.01)
-                                    ->prefix(config('academico.currency_position') === 'before' ? config('academico.currency_symbol') : null)
-                                    ->suffix(config('academico.currency_position') === 'after' ? config('academico.currency_symbol') : null)
-                                    ->visible(fn (): bool => (bool) config('invoicing.price_categories_enabled')),
-                                TextInput::make('price_c')
-                                    ->label(__('Price C'))
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->step(0.01)
-                                    ->prefix(config('academico.currency_position') === 'before' ? config('academico.currency_symbol') : null)
-                                    ->suffix(config('academico.currency_position') === 'after' ? config('academico.currency_symbol') : null)
-                                    ->visible(fn (): bool => (bool) config('invoicing.price_categories_enabled')),
-                                TextInput::make('volume')
-                                    ->label(__('Volume'))
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->suffix('h')
-                                    ->nullable(),
-                                TextInput::make('remote_volume')
-                                    ->label(__('Remote volume'))
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->suffix('h')
-                                    ->nullable(),
-                                TextInput::make('spots')
-                                    ->label(__('Spots'))
-                                    ->required()
-                                    ->integer()
-                                    ->minValue(0),
-                                Checkbox::make('exempt_attendance')
-                                    ->label(__('Exempt from attendance')),
-                                ColorPicker::make('color')
-                                    ->label(__('Color'))
-                                    ->nullable(),
-                            ]),
+        return $form->schema([
+            Tabs::make('Course')
+                ->columnSpanFull()
+                ->tabs([
+                    Tab::make(__('Course info'))
+                        ->schema([
+                            Select::make('rhythm_id')
+                                ->label(__('Rhythm'))
+                                ->relationship('rhythm', 'name')
+                                ->required()
+                                ->preload()
+                                ->searchable(),
 
-                        Tab::make(__('Resources'))
-                            ->schema([
-                                Select::make('teacher_id')
-                                    ->label(__('Teacher'))
-                                    ->relationship('teacher', 'id')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
-                                    ->searchable()
-                                    ->preload()
-                                    ->nullable(),
-                                Select::make('room_id')
-                                    ->label(__('Room'))
-                                    ->relationship('room', 'name')
-                                    ->preload()
-                                    ->nullable(),
-                            ]),
+                            Select::make('level_id')
+                                ->label(__('Level'))
+                                ->relationship('level', 'name')
+                                ->preload()
+                                ->searchable()
+                                ->nullable(),
 
-                        Tab::make(__('Pedagogy'))
-                            ->schema([
-                                Select::make('books')
-                                    ->label(__('Books'))
-                                    ->relationship('books', 'name')
-                                    ->multiple()
-                                    ->preload()
-                                    ->searchable(),
-                                Select::make('evaluation_type_id')
-                                    ->label(__('Evaluation Type'))
-                                    ->relationship('evaluationType', 'name')
-                                    ->preload()
-                                    ->nullable(),
-                                Checkbox::make('marked')
-                                    ->label(__('Evaluation ready'))
-                                    ->visibleOn('edit'),
-                            ]),
+                            TextInput::make('name')
+                                ->label(__('Name'))
+                                ->required()
+                                ->maxLength(100),
 
-                        Tab::make(__('Submodules'))
-                            ->schema([
-                                Repeater::make('children')
-                                    ->relationship()
-                                    ->label(__('Submodules'))
-                                    ->schema([
-                                        TextInput::make('name')
-                                            ->label(__('Name'))
-                                            ->required()
-                                            ->maxLength(100),
-                                        Select::make('level_id')
-                                            ->label(__('Level'))
-                                            ->relationship('level', 'name')
-                                            ->preload()
-                                            ->searchable()
-                                            ->nullable(),
-                                        TextInput::make('volume')
-                                            ->label(__('Volume'))
-                                            ->numeric()
-                                            ->minValue(0)
-                                            ->suffix('h')
-                                            ->nullable(),
-                                    ])
-                                    ->columns(3)
-                                    ->defaultItems(0)
-                                    ->reorderable(false)
-                                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data, $livewire): array {
-                                        $parent = $livewire->getRecord();
-                                        $data['period_id'] = $parent->period_id;
-                                        $data['teacher_id'] = $parent->teacher_id;
-                                        $data['room_id'] = $parent->room_id;
-                                        $data['start_date'] = $parent->start_date;
-                                        $data['end_date'] = $parent->end_date;
-                                        $data['price'] = $parent->price;
-                                        $data['rhythm_id'] = $parent->rhythm_id;
-                                        $data['spots'] = $parent->spots;
+                            TextInput::make('price')
+                                ->label(__('Price'))
+                                ->required()
+                                ->numeric()
+                                ->minValue(0)
+                                ->step(0.01)
+                                ->live(),
 
-                                        return $data;
-                                    }),
-                            ])
-                            ->visibleOn('edit'),
+                            TextInput::make('volume')
+                                ->label(__('Volume'))
+                                ->numeric()
+                                ->suffix('h')
+                                ->nullable()
+                                ->minValue(0),
+                        ]),
 
-                        Tab::make(__('Schedule'))
-                            ->schema([
-                                TextEntry::make(__('Please be aware that if you modify the course dates, the existing attendance for this course will be lost!'))
-                                    ->columnSpanFull()
-                                    ->visibleOn('edit'),
-                                Select::make('period_id')
-                                    ->label(__('Period'))
-                                    ->relationship('period', 'name')
-                                    ->default(fn (): ?int => Period::get_default_period()?->id)
-                                    ->required()
-                                    ->preload()
-                                    ->searchable(),
-                                DatePicker::make('start_date')
-                                    ->label(__('Start Date'))
-                                    ->required(),
-                                DatePicker::make('end_date')
-                                    ->label(__('End Date'))
-                                    ->required(),
-                                Repeater::make('courseTimes')
-                                    ->relationship('times')
-                                    ->label(__('Recurring schedule'))
-                                    ->schema([
-                                        Select::make('day')
-                                            ->options([
-                                                0 => __('Sunday'),
-                                                1 => __('Monday'),
-                                                2 => __('Tuesday'),
-                                                3 => __('Wednesday'),
-                                                4 => __('Thursday'),
-                                                5 => __('Friday'),
-                                                6 => __('Saturday'),
-                                            ])
-                                            ->required(),
-                                        TimePicker::make('start')
-                                            ->required()
-                                            ->seconds(false),
-                                        TimePicker::make('end')
-                                            ->required()
-                                            ->seconds(false),
-                                    ])
-                                    ->columns(3)
-                                    ->defaultItems(0)
-                                    ->reorderable(false),
-                            ]),
-                    ]),
-            ]);
+                    Tab::make(__('Resources'))
+                        ->schema([
+                            Select::make('teacher_id')
+                                ->label(__('Teacher'))
+                                ->relationship('teacher', 'name') // mieux que 'id'
+                                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
+                                ->searchable()
+                                ->preload()
+                                ->nullable(),
+
+                            Select::make('room_id')
+                                ->label(__('Room'))
+                                ->relationship('room', 'name')
+                                ->preload()
+                                ->nullable(),
+                        ]),
+
+                    Tab::make(__('Schedule'))
+                        ->schema([
+                            DatePicker::make('start_date')
+                                ->label(__('Start Date'))
+                                ->required(),
+
+                            DatePicker::make('end_date')
+                                ->label(__('End Date'))
+                                ->required(),
+                        ]),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table

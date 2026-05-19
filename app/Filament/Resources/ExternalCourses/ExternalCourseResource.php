@@ -58,70 +58,95 @@ class ExternalCourseResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $schema
-            ->components([
-                Select::make('partner_id')
-                    ->label(__('Partnership'))
-                    ->relationship('partner', 'name')
-                    ->required()
-                    ->preload()
-                    ->searchable(),
-                Select::make('rhythm_id')
-                    ->label(__('Rhythm'))
-                    ->relationship('rhythm', 'name')
-                    ->preload()
-                    ->searchable(),
-                Select::make('level_id')
-                    ->label(__('Level'))
-                    ->relationship('level', 'name')
-                    ->preload()
-                    ->searchable(),
-                TextInput::make('name')
-                    ->label(__('Name'))
-                    ->required(),
-                TextInput::make('volume')
-                    ->label(__('Volume'))
-                    ->numeric()
-                    ->suffix('h'),
-                TextInput::make('hourly_price')
-                    ->label(__('Hourly Price'))
-                    ->numeric()
-                    ->prefix(config('academico.currency_symbol', '€')),
-                Select::make('teacher_id')
-                    ->label(__('Teacher'))
-                    ->relationship('teacher', titleAttribute: 'id')
-                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
-                    ->preload()
-                    ->searchable(),
-                Select::make('room_id')
-                    ->label(__('Room'))
-                    ->relationship('room', 'name')
-                    ->preload()
-                    ->searchable(),
-                Select::make('period_id')
-                    ->label(__('Period'))
-                    ->relationship('period', 'name')
-                    ->required()
-                    ->preload()
-                    ->searchable()
-                    ->default(fn () => Period::get_default_period()?->id),
-                Select::make('campus_id')
-                    ->label(__('Campus'))
-                    ->relationship('campus', 'name')
-                    ->preload(),
-                DatePicker::make('start_date')
-                    ->label(__('Start Date')),
-                DatePicker::make('end_date')
-                    ->label(__('End Date')),
-                TextInput::make('head_count')
-                    ->label(__('Head Count'))
-                    ->numeric()
-                    ->default(0),
-                TextInput::make('new_students')
-                    ->label(__('Students to count in year total'))
-                    ->numeric()
-                    ->default(0),
-            ]);
+        return $form->schema([
+            Select::make('partner_id')
+                ->label(__('Partnership'))
+                ->relationship('partner', 'name')
+                ->required()
+                ->preload()
+                ->searchable(),
+
+            Select::make('rhythm_id')
+                ->label(__('Rhythm'))
+                ->relationship('rhythm', 'name')
+                ->preload()
+                ->searchable(),
+
+            Select::make('level_id')
+                ->label(__('Level'))
+                ->relationship('level', 'name')
+                ->preload()
+                ->searchable(),
+
+            TextInput::make('name')
+                ->label(__('Name'))
+                ->required()
+                ->maxLength(255),
+
+            TextInput::make('volume')
+                ->label(__('Volume'))
+                ->numeric()
+                ->suffix('h')
+                ->minValue(0)
+                ->nullable(),
+
+            TextInput::make('hourly_price')
+                ->label(__('Hourly Price'))
+                ->numeric()
+                ->prefix(config('academico.currency_symbol', '€'))
+                ->minValue(0)
+                ->nullable(),
+
+            Select::make('teacher_id')
+                ->label(__('Teacher'))
+                ->relationship('teacher', 'name')
+                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name)
+                ->preload()
+                ->searchable()
+                ->nullable(),
+
+            Select::make('room_id')
+                ->label(__('Room'))
+                ->relationship('room', 'name')
+                ->preload()
+                ->searchable()
+                ->nullable(),
+
+            Select::make('period_id')
+                ->label(__('Period'))
+                ->relationship('period', 'name')
+                ->required()
+                ->preload()
+                ->searchable()
+                ->default(fn () => Period::get_default_period()?->id),
+
+            Select::make('campus_id')
+                ->label(__('Campus'))
+                ->relationship('campus', 'name')
+                ->preload()
+                ->searchable()
+                ->nullable(),
+
+            DatePicker::make('start_date')
+                ->label(__('Start Date'))
+                ->nullable(),
+
+            DatePicker::make('end_date')
+                ->label(__('End Date'))
+                ->nullable(),
+
+            TextInput::make('head_count')
+                ->label(__('Head Count'))
+                ->numeric()
+                ->default(0)
+                ->minValue(0),
+
+            TextInput::make('new_students')
+                ->label(__('Students to count in year total'))
+                ->numeric()
+                ->default(0)
+                ->minValue(0),
+        ]);
     }
 
     public static function table(Table $table): Table

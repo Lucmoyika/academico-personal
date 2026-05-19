@@ -152,7 +152,7 @@ class CourseEnrollments extends Page implements HasTable
                             ->limit(50)
                             ->get()
                             ->pluck('name', 'id'))
-                        ->getOptionLabelUsing(fn ($value) => Student::find($value)?->name)
+                        ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name)
                         ->required(),
                 ])
                 ->action(function (array $data) {
