@@ -16,11 +16,15 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => User::factory(),
-            'idnumber' => fake()->optional()->numerify('########'),
-            'address' => fake()->optional()->address(),
-            'birthdate' => fake()->optional()->date(),
-            'gender_id' => fake()->optional()->numberBetween(1, 3),
+            'id' => User::factory()->state([
+                'firstname' => fake()->firstName(),
+                'lastname' => fake()->lastName(),
+                'email' => fake()->unique()->safeEmail(),
+            ]),
+            'idnumber' => fake()->unique()->numerify('STD-########'),
+            'address' => fake()->address(),
+            'birthdate' => fake()->dateTimeBetween('-30 years', '-8 years')->format('Y-m-d'),
+            'gender_id' => fake()->randomElement([1, 2]),
         ];
     }
 }

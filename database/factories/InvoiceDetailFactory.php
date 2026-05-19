@@ -15,13 +15,19 @@ class InvoiceDetailFactory extends Factory
 
     public function definition(): array
     {
+        $price = fake()->numberBetween(5000, 30000);
+
         return [
             'invoice_id' => Invoice::factory(),
-            'product_name' => fake()->word(),
-            'product_code' => fake()->word(),
-            'product_id' => fake()->randomNumber(),
-            'product_type' => fake()->word(),
-            'price' => fake()->randomFloat(2, 10, 500),
+            'product_name' => fake()->words(2, true),
+            'product_code' => strtoupper(fake()->bothify('PRD-###')),
+            'product_id' => fake()->numberBetween(1, 9999),
+            'product_type' => 'manual',
+            'price' => $price,
+            'tax_rate' => 0,
+            'quantity' => 1,
+            'final_price' => $price,
+            'comment' => fake()->optional()->sentence(),
         ];
     }
 }
