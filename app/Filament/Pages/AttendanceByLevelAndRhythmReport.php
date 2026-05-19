@@ -7,10 +7,12 @@ use App\Models\Course;
 use App\Models\Level;
 use App\Models\Period;
 use App\Models\Rhythm;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Collection;
+
 class AttendanceByLevelAndRhythmReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-bars-3';
+    protected static ?string $navigationIcon = 'heroicon-o-bars-3';
 
     protected static ?int $navigationSort = 814;
 
@@ -20,7 +22,7 @@ class AttendanceByLevelAndRhythmReport extends ReportPage
             && (bool) config('settings.attendance_reports_enabled');
     }
 
-    protected string $view = 'filament.pages.attendance-by-level-and-rhythm-report';
+    protected static string $view = 'filament.pages.attendance-by-level-and-rhythm-report';
 
     public ?int $selectedPeriodId = null;
 
@@ -74,7 +76,7 @@ class AttendanceByLevelAndRhythmReport extends ReportPage
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, Course>  $courses
+     * @param  Collection<int, Course>  $courses
      */
     protected function loadLevelData($courses): void
     {
@@ -130,7 +132,7 @@ class AttendanceByLevelAndRhythmReport extends ReportPage
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, Course>  $courses
+     * @param  Collection<int, Course>  $courses
      */
     protected function loadRhythmData($courses): void
     {
@@ -195,7 +197,7 @@ class AttendanceByLevelAndRhythmReport extends ReportPage
         return __('Attendance by Level & Rhythm');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Attendance by Level & Rhythm');
     }

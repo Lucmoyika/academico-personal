@@ -9,17 +9,17 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 
 class CreateLeave extends CreateRecord
 {
     protected static string $resource = LeaveResource::class;
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->schema([
             Select::make('teacher_ids')
                 ->label(__('Teachers'))
                 ->options(fn () => Teacher::with('user')->get()->pluck('name', 'id'))

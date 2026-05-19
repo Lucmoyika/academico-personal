@@ -4,10 +4,11 @@ namespace App\Filament\Auth;
 
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Actions\Action;
-use Filament\Auth\Http\Responses\Contracts\LoginResponse;
-use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Facades\Filament;
-use Filament\Support\Enums\Width;
+use Filament\Http\Responses\Auth\Contracts\LoginResponse;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Pages\Auth\Login as BaseLogin;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\HtmlString;
@@ -32,7 +33,7 @@ class Login extends BaseLogin
 
         $user = Filament::auth()->user();
 
-        if ($user->isStudent()) {
+        if (method_exists($user, 'isStudent') && $user->isStudent()) {
             session()->regenerate();
 
             return new class implements LoginResponse
@@ -44,7 +45,7 @@ class Login extends BaseLogin
             };
         }
 
-        if (! $user->canAccessPanel(Filament::getCurrentPanel())) {
+        if (($user instanceof FilamentUser) && (! $user->canAccessPanel(Filament::getCurrentPanel()))) {
             Filament::auth()->logout();
 
             $this->throwFailureValidationException();
@@ -57,7 +58,20 @@ class Login extends BaseLogin
 
     public function getSubheading(): string|Htmlable|null
     {
-        return new HtmlString(__('filament-panels::auth/pages/login.actions.register.before').' '.$this->registerAction->toHtml());
+        $before = __('filament-panels::auth/pages/login.actions.register.before');
+        $label = __('filament-panels::auth/pages/login.actions.register.label');
+
+        // If translations are missing, they will return the key string.
+        // Provide human-friendly fallbacks to avoid showing raw keys in the UI.
+        if ($before === 'filament-panels::auth/pages/login.actions.register.before') {
+            $before = __('Don\'t have an account?');
+        }
+
+        if ($label === 'filament-panels::auth/pages/login.actions.register.label') {
+            $label = __('Register');
+        }
+
+        return new HtmlString($before.' '.$this->registerAction()->label($label)->toHtml());
     }
 
     public function registerAction(): Action
@@ -77,10 +91,10 @@ class Login extends BaseLogin
         return parent::getView();
     }
 
-    public function getMaxContentWidth(): Width|string|null
+    public function getMaxContentWidth(): MaxWidth|string|null
     {
         if (View::exists('filament.auth.login')) {
-            return Width::FiveExtraLarge;
+            return MaxWidth::FiveExtraLarge;
         }
 
         return parent::getMaxContentWidth();

@@ -3,14 +3,15 @@
 namespace App\Filament\Pages;
 
 use App\Models\Period;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+
 class LevelsAndRhythmsReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?int $navigationSort = 807;
 
-    protected string $view = 'filament.pages.levels-and-rhythms-report';
+    protected static string $view = 'filament.pages.levels-and-rhythms-report';
 
     public static function canAccess(): bool
     {
@@ -157,7 +158,7 @@ class LevelsAndRhythmsReport extends ReportPage
         return __('Levels & Rhythms Report');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Levels & Rhythms Report');
     }

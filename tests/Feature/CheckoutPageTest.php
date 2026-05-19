@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Filament\Pages\CheckoutPage;
+use App\Filament\Resources\Enrollments\EnrollmentResource;
 use App\Models\Config;
 use App\Models\Course;
 use App\Models\Enrollment;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class CheckoutPageTest extends TestCase
@@ -67,7 +69,7 @@ class CheckoutPageTest extends TestCase
         Permission::findOrCreate('enrollments.view', 'web');
         $role = Role::findOrCreate('admin', 'web');
         $role->givePermissionTo(['enrollments.edit', 'enrollments.view']);
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $admin = User::factory()->create();
         $admin->assignRole('admin');
@@ -165,7 +167,7 @@ class CheckoutPageTest extends TestCase
 
     public function test_checkout_button_visible_on_unpaid_enrollment(): void
     {
-        $this->get(route('filament.admin.resources.enrollments.view', $this->enrollment))
+        $this->get(EnrollmentResource::getUrl('view', ['record' => $this->enrollment]))
             ->assertSuccessful()
             ->assertSee(__('Checkout enrollment'));
     }
@@ -174,7 +176,7 @@ class CheckoutPageTest extends TestCase
     {
         $this->enrollment->update(['status_id' => 2]);
 
-        $this->get(route('filament.admin.resources.enrollments.view', $this->enrollment))
+        $this->get(EnrollmentResource::getUrl('view', ['record' => $this->enrollment]))
             ->assertSuccessful()
             ->assertDontSee(__('Checkout enrollment'));
     }

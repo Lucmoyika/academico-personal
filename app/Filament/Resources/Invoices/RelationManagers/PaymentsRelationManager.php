@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\Invoices\RelationManagers;
 
 use App\Models\Paymentmethod;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -40,7 +40,7 @@ class PaymentsRelationManager extends RelationManager
                     ->label(__('Comment'))
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -49,9 +49,9 @@ class PaymentsRelationManager extends RelationManager
             ]);
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema->components([
+        return $form->schema([
             Select::make('payment_method')
                 ->label(__('Payment Method'))
                 ->options(Paymentmethod::pluck('name', 'code'))

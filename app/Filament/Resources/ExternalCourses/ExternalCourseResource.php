@@ -5,18 +5,16 @@ namespace App\Filament\Resources\ExternalCourses;
 use App\Filament\Resources\ExternalCourses\Pages\ManageExternalCourses;
 use App\Models\Course;
 use App\Models\Period;
-use BackedEnum;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -26,7 +24,7 @@ class ExternalCourseResource extends Resource
 {
     protected static ?string $model = Course::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
+    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
     protected static ?string $slug = 'external-courses';
 
@@ -58,7 +56,7 @@ class ExternalCourseResource extends Resource
         return parent::getEloquentQuery()->external();
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->components([
@@ -214,13 +212,13 @@ class ExternalCourseResource extends Resource
                     ->relationship('period', 'name')
                     ->default(fn () => Period::get_default_period()?->id),
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 ActionGroup::make([
                     DeleteAction::make(),
                 ]),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

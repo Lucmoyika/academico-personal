@@ -10,7 +10,6 @@ use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Livewire;
-use Filament\Schemas\Schema;
 
 class ViewStudent extends ViewRecord
 {
@@ -28,7 +27,7 @@ class ViewStudent extends ViewRecord
         $ownerRecord = $this->getRecord();
         $livewireData = ['ownerRecord' => $ownerRecord, 'pageClass' => static::class];
 
-        return $schema->components([
+        return $form->schema([
             Grid::make(['default' => 1, 'lg' => 2])->schema([
                 $this->getInfolistContentComponent()->columnSpan(1),
                 Livewire::make(CommentsRelationManager::class, [

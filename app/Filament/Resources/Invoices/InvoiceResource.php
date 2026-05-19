@@ -9,21 +9,20 @@ use App\Filament\Resources\Invoices\RelationManagers\InvoiceDetailsRelationManag
 use App\Filament\Resources\Invoices\RelationManagers\PaymentsRelationManager;
 use App\Models\Invoice;
 use App\Services\InvoiceService;
-use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -34,7 +33,7 @@ class InvoiceResource extends Resource
 {
     protected static ?string $model = Invoice::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 380;
 
@@ -70,10 +69,10 @@ class InvoiceResource extends Resource
             ->with(['invoiceType', 'payments', 'invoiceDetails']);
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 DatePicker::make('date')
                     ->label(__('Date'))
                     ->required(),
@@ -109,7 +108,7 @@ class InvoiceResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
         $currencySymbol = config('academico.currency_symbol');
         $currencyPosition = config('academico.currency_position');
@@ -117,8 +116,8 @@ class InvoiceResource extends Resource
             ? $currencySymbol.' '.number_format((float) $value, 2)
             : number_format((float) $value, 2).' '.$currencySymbol;
 
-        return $schema
-            ->components([
+        return $infolist
+            ->schema([
                 Section::make(__('Invoice Summary'))
                     ->columns(3)
                     ->schema([
@@ -222,10 +221,10 @@ class InvoiceResource extends Resource
                     ->label(__('Invoice Type'))
                     ->preload(),
             ])
-            ->recordActions([
+            ->actions([
                 Action::make('download_pdf')
                     ->label(__('PDF'))
-                    ->icon(Heroicon::OutlinedArrowDownTray)
+                    ->icon('heroicon-o-arrow-down-tray')
                     ->action(function (Invoice $record) {
                         $service = app(InvoiceService::class);
 
@@ -238,7 +237,7 @@ class InvoiceResource extends Resource
                     DeleteAction::make(),
                 ]),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

@@ -6,17 +6,16 @@ use App\Models\Enrollment;
 use App\Models\Event;
 use App\Models\Period;
 use App\Models\Teacher;
-use BackedEnum;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 
 class TeacherDashboard extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?int $navigationSort = 1;
 
-    protected string $view = 'filament.pages.teacher-dashboard';
+    protected static string $view = 'filament.pages.teacher-dashboard';
 
     public ?int $selectedPeriodId = null;
 

@@ -4,9 +4,9 @@ namespace App\Filament\Resources\Students\RelationManagers;
 
 use App\Filament\Resources\Enrollments\EnrollmentResource;
 use App\Filament\Resources\Students\StudentResource;
-use Filament\Actions\Action;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Colors\Color;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;

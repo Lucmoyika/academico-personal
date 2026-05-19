@@ -4,14 +4,15 @@ namespace App\Filament\Pages;
 
 use App\Models\Course;
 use App\Models\Period;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+
 class CoursesReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?int $navigationSort = 810;
 
-    protected string $view = 'filament.pages.courses-report';
+    protected static string $view = 'filament.pages.courses-report';
 
     public static function canAccess(): bool
     {
@@ -82,7 +83,7 @@ class CoursesReport extends ReportPage
         return __('Courses Report');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Courses Report');
     }

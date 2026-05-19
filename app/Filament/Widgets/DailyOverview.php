@@ -11,7 +11,7 @@ class DailyOverview extends Widget
 {
     protected static ?int $sort = 3;
 
-    protected string $view = 'filament.widgets.daily-overview';
+    protected static string $view = 'filament.widgets.daily-overview';
 
     protected int|string|array $columnSpan = 'full';
 

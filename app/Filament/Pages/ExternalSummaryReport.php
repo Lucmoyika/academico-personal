@@ -4,11 +4,12 @@ namespace App\Filament\Pages;
 
 use App\Services\DateRange;
 use App\Services\StatService;
-use BackedEnum;
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Htmlable;
+
 class ExternalSummaryReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
     protected static ?int $navigationSort = 832;
 
@@ -18,7 +19,7 @@ class ExternalSummaryReport extends ReportPage
             && (bool) config('settings.external_courses_enabled');
     }
 
-    protected string $view = 'filament.pages.external-summary-report';
+    protected static string $view = 'filament.pages.external-summary-report';
 
     public ?string $startDate = null;
 
@@ -91,7 +92,7 @@ class ExternalSummaryReport extends ReportPage
         return __('External Summary');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('External Summary Report');
     }

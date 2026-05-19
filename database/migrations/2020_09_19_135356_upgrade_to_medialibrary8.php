@@ -14,18 +14,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('media', function (Blueprint $table) {
-            $table->string('conversions_disk')->nullable();
-            $table->uuid('uuid')->nullable();
-        });
+        // Add columns only if they don't already exist (make migration idempotent)
+        if (! Schema::hasColumn('media', 'conversions_disk') || ! Schema::hasColumn('media', 'uuid')) {
+            Schema::table('media', function (Blueprint $table) {
+                if (! Schema::hasColumn('media', 'conversions_disk')) {
+                    $table->string('conversions_disk')->nullable();
+                }
 
-        DB::raw("UPDATE media SET 'conversions_disk' = 'disk';");
+                if (! Schema::hasColumn('media', 'uuid')) {
+                    // Use a 36-char string for UUID to avoid DB engines that don't support the `uuid` column type
+                    $table->string('uuid', 36)->nullable();
+                }
+            });
 
-        Media::cursor()->each(
-            function (Media $media) {
-                return $media->update(['uuid' => Str::uuid()]);
-            }
-        );
+            // Ensure existing media rows have a conversions_disk value
+            DB::statement("UPDATE media SET conversions_disk = 'disk' WHERE conversions_disk IS NULL;");
+
+            // Update existing media rows with generated UUIDs where missing
+            Media::whereNull('uuid')->cursor()->each(function (Media $media) {
+                $media->update(['uuid' => Str::uuid()->toString()]);
+            });
+        }
     }
 
     /**

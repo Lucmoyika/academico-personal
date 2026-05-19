@@ -7,8 +7,8 @@ use App\Models\Leave;
 use App\Models\Period;
 use App\Models\Room;
 use App\Models\Teacher;
-use BackedEnum;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 
 class CalendarCombined extends Page
 {
@@ -17,11 +17,11 @@ class CalendarCombined extends Page
         return auth()->user()?->can('calendars.view') ?? false;
     }
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-calendar';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     protected static ?int $navigationSort = 400;
 
-    protected string $view = 'filament.pages.calendar-combined';
+    protected static string $view = 'filament.pages.calendar-combined';
 
     public const UNASSIGNED_KEY = 'unassigned';
 
@@ -169,7 +169,7 @@ class CalendarCombined extends Page
         return __('Combined Schedule');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Combined Schedule');
     }

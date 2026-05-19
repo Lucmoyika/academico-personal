@@ -5,10 +5,10 @@ namespace App\Filament\Resources\Enrollments\Pages;
 use App\Filament\Resources\Enrollments\EnrollmentResource;
 use App\Models\Course;
 use App\Models\Period;
-use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -22,7 +22,7 @@ class ChangeEnrollmentCourse extends Page implements HasTable
 
     protected static string $resource = EnrollmentResource::class;
 
-    protected string $view = 'filament.resources.enrollments.pages.change-enrollment-course';
+    protected static string $view = 'filament.resources.enrollments.pages.change-enrollment-course';
 
     public function mount(int|string $record): void
     {
@@ -99,7 +99,7 @@ class ChangeEnrollmentCourse extends Page implements HasTable
                     ->preload(),
             ])
             ->defaultSort('start_date', 'desc')
-            ->recordActions([
+            ->actions([
                 Action::make('select')
                     ->label(__('Select'))
                     ->icon('heroicon-o-check-circle')

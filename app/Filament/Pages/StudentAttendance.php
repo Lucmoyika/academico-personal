@@ -5,11 +5,12 @@ namespace App\Filament\Pages;
 use App\Models\Attendance;
 use App\Models\AttendanceType;
 use App\Models\Course;
+use App\Models\Event;
 use App\Models\Student;
-use BackedEnum;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
 
 class StudentAttendance extends Page
@@ -19,11 +20,11 @@ class StudentAttendance extends Page
         return auth()->user()?->can('attendance.view') ?? false;
     }
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user';
+    protected static ?string $navigationIcon = 'heroicon-o-user';
 
     protected static bool $shouldRegisterNavigation = false;
 
-    protected string $view = 'filament.pages.student-attendance';
+    protected static string $view = 'filament.pages.student-attendance';
 
     public ?int $studentId = null;
 
@@ -155,7 +156,7 @@ class StudentAttendance extends Page
             return;
         }
 
-        $event = \App\Models\Event::find($eventId);
+        $event = Event::find($eventId);
         abort_unless($event && Gate::allows('edit-attendance', $event), 403);
 
         Attendance::updateOrCreate(
@@ -185,7 +186,7 @@ class StudentAttendance extends Page
             ->send();
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Student Attendance Report');
     }

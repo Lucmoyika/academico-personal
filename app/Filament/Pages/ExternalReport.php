@@ -7,10 +7,11 @@ use App\Models\Partner;
 use App\Models\Period;
 use App\Models\Year;
 use App\Services\StatService;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+
 class ExternalReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?int $navigationSort = 830;
 
@@ -20,7 +21,7 @@ class ExternalReport extends ReportPage
             && (bool) config('settings.external_courses_enabled');
     }
 
-    protected string $view = 'filament.pages.external-report';
+    protected static string $view = 'filament.pages.external-report';
 
     public ?int $startFromPeriodId = null;
 
@@ -226,7 +227,7 @@ class ExternalReport extends ReportPage
         return __('External Report');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('External Report');
     }

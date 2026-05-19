@@ -9,17 +9,18 @@ use App\Filament\Resources\Students\StudentResource;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
-use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Filament\Support\Colors\Color;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Url;
 
@@ -30,7 +31,7 @@ class CourseEnrollments extends Page implements HasTable
 
     protected static string $resource = CourseResource::class;
 
-    protected string $view = 'filament.resources.courses.pages.course-enrollments';
+    protected static string $view = 'filament.resources.courses.pages.course-enrollments';
 
     #[Url]
     public string $viewMode = 'list';
@@ -93,7 +94,7 @@ class CourseEnrollments extends Page implements HasTable
             ->recordUrl(fn ($record) => auth()->user()->can('enrollments.edit')
                 ? EnrollmentResource::getUrl('view', ['record' => $record])
                 : StudentResource::getUrl('edit', ['record' => $record->student_id]))
-            ->recordActions([
+            ->actions([
                 Action::make('view_student')
                     ->label(__('Student'))
                     ->icon('heroicon-o-user')
@@ -126,7 +127,7 @@ class CourseEnrollments extends Page implements HasTable
         ];
     }
 
-    public function getRosterEnrollments(): \Illuminate\Support\Collection
+    public function getRosterEnrollments(): Collection
     {
         return $this->getRecord()
             ->enrollments()

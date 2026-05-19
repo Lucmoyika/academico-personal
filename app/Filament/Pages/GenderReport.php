@@ -5,14 +5,15 @@ namespace App\Filament\Pages;
 use App\Models\Config;
 use App\Models\Period;
 use App\Services\StatService;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+
 class GenderReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?int $navigationSort = 850;
 
-    protected string $view = 'filament.pages.gender-report';
+    protected static string $view = 'filament.pages.gender-report';
 
     public static function canAccess(): bool
     {
@@ -168,7 +169,7 @@ class GenderReport extends ReportPage
         return __('Gender Report');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Gender Report');
     }

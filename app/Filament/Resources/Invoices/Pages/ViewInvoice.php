@@ -11,7 +11,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Support\Icons\Heroicon;
 
 class ViewInvoice extends ViewRecord
 {
@@ -24,7 +23,7 @@ class ViewInvoice extends ViewRecord
         return [
             Action::make('retry_accounting')
                 ->label(__('Retry send to accounting'))
-                ->icon(Heroicon::OutlinedArrowPath)
+                ->icon('heroicon-o-arrow-path')
                 ->requiresConfirmation()
                 ->modalDescription(__('This will attempt to send the invoice to the external accounting system.'))
                 ->visible(fn () => (config('invoicing.accounting_enabled') || ! in_array(config('invoicing.invoicing_system'), ['internal', null], true)) && empty($this->getRecord()->receipt_number))
@@ -82,7 +81,7 @@ class ViewInvoice extends ViewRecord
                 }),
             Action::make('download_pdf')
                 ->label(__('Download PDF'))
-                ->icon(Heroicon::OutlinedArrowDownTray)
+                ->icon('heroicon-o-arrow-down-tray')
                 ->action(function () {
                     $service = app(InvoiceService::class);
                     $record = $this->getRecord();

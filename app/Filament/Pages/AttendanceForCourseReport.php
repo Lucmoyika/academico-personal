@@ -5,10 +5,11 @@ namespace App\Filament\Pages;
 use App\Models\AttendanceType;
 use App\Models\Course;
 use App\Models\Period;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+
 class AttendanceForCourseReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     protected static ?int $navigationSort = 816;
 
@@ -18,7 +19,7 @@ class AttendanceForCourseReport extends ReportPage
             && (bool) config('settings.attendance_reports_enabled');
     }
 
-    protected string $view = 'filament.pages.attendance-for-course-report';
+    protected static string $view = 'filament.pages.attendance-for-course-report';
 
     public ?int $selectedPeriodId = null;
 
@@ -125,7 +126,7 @@ class AttendanceForCourseReport extends ReportPage
         return __('Attendance per Course');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Attendance per Course');
     }

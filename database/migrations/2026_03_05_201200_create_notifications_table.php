@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            // Use string(36) for UUID values to support MariaDB/MySQL without `uuid` column type
+            $table->string('id', 36)->primary();
             $table->string('type');
             $table->morphs('notifiable');
             $table->text('data');

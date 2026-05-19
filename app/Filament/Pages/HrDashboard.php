@@ -4,17 +4,17 @@ namespace App\Filament\Pages;
 
 use App\Models\Period;
 use App\Models\Teacher;
-use BackedEnum;
 use Carbon\Carbon;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 
 class HrDashboard extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+    protected static ?string $navigationIcon = 'heroicon-o-clock';
 
     protected static ?int $navigationSort = 520;
 
-    protected string $view = 'filament.pages.hr-dashboard';
+    protected static string $view = 'filament.pages.hr-dashboard';
 
     public static function canAccess(): bool
     {
@@ -140,7 +140,7 @@ class HrDashboard extends Page
         return __('HR Dashboard');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('HR Dashboard');
     }

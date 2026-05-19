@@ -4,12 +4,11 @@ namespace App\Filament\Resources\Payments;
 
 use App\Filament\Resources\Payments\Pages\ManagePayments;
 use App\Models\Payment;
-use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -19,7 +18,7 @@ class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
     protected static ?int $navigationSort = 382;
 
@@ -55,9 +54,9 @@ class PaymentResource extends Resource
             ->with(['invoice.invoiceDetails', 'paymentmethod']);
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->components([]);
+        return $form->schema([]);
     }
 
     public static function table(Table $table): Table
@@ -103,7 +102,7 @@ class PaymentResource extends Resource
             ->filters([
                 Filter::make('month')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('month')
+                        DatePicker::make('month')
                             ->label(__('Month'))
                             ->displayFormat('MM/YYYY'),
                     ])
@@ -115,7 +114,7 @@ class PaymentResource extends Resource
                         );
                     }),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

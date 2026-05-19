@@ -7,10 +7,11 @@ use App\Models\AttendanceType;
 use App\Models\Course;
 use App\Models\Event;
 use App\Models\Period;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+
 class AttendanceReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     protected static ?int $navigationSort = 812;
 
@@ -20,7 +21,7 @@ class AttendanceReport extends ReportPage
             && (bool) config('settings.attendance_reports_enabled');
     }
 
-    protected string $view = 'filament.pages.attendance-report';
+    protected static string $view = 'filament.pages.attendance-report';
 
     public ?int $selectedPeriodId = null;
 
@@ -126,7 +127,7 @@ class AttendanceReport extends ReportPage
         return __('Attendance Report');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Attendance Report');
     }

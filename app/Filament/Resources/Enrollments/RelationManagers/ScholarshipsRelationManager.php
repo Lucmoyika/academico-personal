@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Enrollments\RelationManagers;
 
-use Filament\Actions\AttachAction;
-use Filament\Actions\DetachAction;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Actions\AttachAction;
+use Filament\Tables\Actions\DetachAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -33,7 +33,7 @@ class ScholarshipsRelationManager extends RelationManager
                 AttachAction::make()
                     ->preloadRecordSelect(),
             ])
-            ->recordActions([
+            ->actions([
                 DetachAction::make(),
             ]);
     }

@@ -3,14 +3,15 @@
 namespace App\Filament\Pages;
 
 use App\Models\Partner;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+
 class PartnershipsReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?int $navigationSort = 840;
 
-    protected string $view = 'filament.pages.partnerships-report';
+    protected static string $view = 'filament.pages.partnerships-report';
 
     public static function canAccess(): bool
     {
@@ -46,7 +47,7 @@ class PartnershipsReport extends ReportPage
         return __('Partnerships');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Partnerships Report');
     }

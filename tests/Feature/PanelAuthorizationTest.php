@@ -18,6 +18,7 @@ use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PanelAuthorizationTest extends TestCase
@@ -57,7 +58,7 @@ class PanelAuthorizationTest extends TestCase
 
         Role::create(['name' => 'viewer']);
 
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     // ── Panel access ──
@@ -67,7 +68,7 @@ class PanelAuthorizationTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('admin');
 
-        $this->assertTrue($user->canAccessPanel(Filament::getCurrentOrDefaultPanel()));
+        $this->assertTrue($user->canAccessPanel(Filament::getDefaultPanel()));
     }
 
     public function test_secretary_can_access_panel(): void
@@ -75,7 +76,7 @@ class PanelAuthorizationTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('secretary');
 
-        $this->assertTrue($user->canAccessPanel(Filament::getCurrentOrDefaultPanel()));
+        $this->assertTrue($user->canAccessPanel(Filament::getDefaultPanel()));
     }
 
     public function test_viewer_can_access_panel(): void
@@ -83,21 +84,21 @@ class PanelAuthorizationTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('viewer');
 
-        $this->assertTrue($user->canAccessPanel(Filament::getCurrentOrDefaultPanel()));
+        $this->assertTrue($user->canAccessPanel(Filament::getDefaultPanel()));
     }
 
     public function test_teacher_can_access_panel(): void
     {
         $teacher = Teacher::factory()->create();
 
-        $this->assertTrue($teacher->user->canAccessPanel(Filament::getCurrentOrDefaultPanel()));
+        $this->assertTrue($teacher->user->canAccessPanel(Filament::getDefaultPanel()));
     }
 
     public function test_user_without_role_cannot_access_panel(): void
     {
         $user = User::factory()->create();
 
-        $this->assertFalse($user->canAccessPanel(Filament::getCurrentOrDefaultPanel()));
+        $this->assertFalse($user->canAccessPanel(Filament::getDefaultPanel()));
     }
 
     // ── Resource access for admin ──

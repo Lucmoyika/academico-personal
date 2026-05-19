@@ -6,16 +6,16 @@ use App\Filament\Resources\Students\StudentResource;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Period;
-use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Support\Facades\Gate;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Gate;
 
 class EnrollStudent extends Page implements HasTable
 {
@@ -24,7 +24,7 @@ class EnrollStudent extends Page implements HasTable
 
     protected static string $resource = StudentResource::class;
 
-    protected string $view = 'filament.resources.students.pages.enroll-student';
+    protected static string $view = 'filament.resources.students.pages.enroll-student';
 
     public static function canAccess(array $parameters = []): bool
     {
@@ -106,7 +106,7 @@ class EnrollStudent extends Page implements HasTable
                     ->preload(),
             ])
             ->defaultSort('start_date', 'desc')
-            ->recordActions([
+            ->actions([
                 Action::make('enroll')
                     ->label(__('Enroll'))
                     ->icon('heroicon-o-plus-circle')

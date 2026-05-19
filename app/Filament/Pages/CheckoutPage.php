@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Resources\Enrollments\EnrollmentResource;
+use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Interfaces\InvoicingInterface;
 use App\Models\Book;
 use App\Models\Comment;
@@ -16,7 +18,6 @@ use App\Models\Paymentmethod;
 use App\Models\ScheduledPayment;
 use App\Models\Tax;
 use App\Traits\ReportsErrors;
-use BackedEnum;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\Action as PageAction;
@@ -24,15 +25,14 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Wizard;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
@@ -41,11 +41,11 @@ class CheckoutPage extends Page
 {
     use ReportsErrors;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingCart;
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?int $navigationSort = 4;
 
-    protected string $view = 'filament.pages.checkout';
+    protected static string $view = 'filament.pages.checkout';
 
     public ?array $data = [];
 
@@ -204,13 +204,13 @@ class CheckoutPage extends Page
         ];
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Wizard::make([
                     Wizard\Step::make(__('Cart'))
-                        ->icon(Heroicon::OutlinedShoppingCart)
+                        ->icon('heroicon-o-shopping-cart')
                         ->columns(12)
                         ->afterValidation(function () {
                             $products = $this->data['products'] ?? [];
@@ -268,7 +268,7 @@ class CheckoutPage extends Page
                                         ->extraItemActions([
                                             PageAction::make('addDiscount')
                                                 ->label(__('Add discount'))
-                                                ->icon(Heroicon::OutlinedReceiptPercent)
+                                                ->icon('heroicon-o-receipt-percent')
                                                 ->form([
                                                     Select::make('discount_id')
                                                         ->label(__('Discount'))
@@ -299,7 +299,7 @@ class CheckoutPage extends Page
                                                 }),
                                             PageAction::make('addTax')
                                                 ->label(__('Add tax'))
-                                                ->icon(Heroicon::OutlinedCalculator)
+                                                ->icon('heroicon-o-calculator')
                                                 ->form([
                                                     Select::make('tax_id')
                                                         ->label(__('Tax'))
@@ -369,7 +369,7 @@ class CheckoutPage extends Page
                         ]),
 
                     Wizard\Step::make(__('Payment'))
-                        ->icon(Heroicon::OutlinedCreditCard)
+                        ->icon('heroicon-o-credit-card')
                         ->columns(12)
                         ->schema([
                             // Main content
@@ -458,7 +458,7 @@ class CheckoutPage extends Page
                                 ]),
                         ]),
                 ])
-                    ->submitAction(view('filament.pages.checkout-submit-button')),
+                    ->submitAction(new HtmlString(view('filament.pages.checkout-submit-button')->render())),
             ])
             ->statePath('data');
     }
@@ -714,9 +714,9 @@ class CheckoutPage extends Page
                 ->send();
 
             if ($this->enrollment) {
-                $this->redirect(route('filament.admin.resources.enrollments.view', $this->enrollment));
+                $this->redirect(EnrollmentResource::getUrl('view', ['record' => $this->enrollment]));
             } else {
-                $this->redirect(route('filament.admin.resources.invoices.view', $invoice));
+                $this->redirect(InvoiceResource::getUrl('view', ['record' => $invoice]));
             }
         } catch (\Throwable $e) {
             $this->reportError($e, 'CheckoutPage::submit', [
@@ -749,9 +749,9 @@ class CheckoutPage extends Page
 
                         $invoice = Invoice::find($this->lastInvoiceId);
                         if ($this->enrollment) {
-                            $this->redirect(route('filament.admin.resources.enrollments.view', $this->enrollment));
+                            $this->redirect(EnrollmentResource::getUrl('view', ['record' => $this->enrollment]));
                         } else {
-                            $this->redirect(route('filament.admin.resources.invoices.view', $invoice));
+                            $this->redirect(InvoiceResource::getUrl('view', ['record' => $invoice]));
                         }
                     }),
                 Action::make('deleteAndRetry')
@@ -785,7 +785,7 @@ class CheckoutPage extends Page
                             ->send();
 
                         if ($this->enrollment) {
-                            $this->redirect(route('filament.admin.resources.enrollments.view', $this->enrollment));
+                            $this->redirect(EnrollmentResource::getUrl('view', ['record' => $this->enrollment]));
                         } else {
                             $this->redirect(route('filament.admin.pages.checkout'));
                         }

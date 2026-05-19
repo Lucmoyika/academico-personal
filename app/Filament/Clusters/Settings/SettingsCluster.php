@@ -2,19 +2,17 @@
 
 namespace App\Filament\Clusters\Settings;
 
-use BackedEnum;
 use Filament\Clusters\Cluster;
-use Filament\Pages\Enums\SubNavigationPosition;
-use Filament\Support\Icons\Heroicon;
+use Filament\Pages\SubNavigationPosition;
 use Illuminate\Contracts\Support\Htmlable;
 
 class SettingsCluster extends Cluster
 {
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+    protected static ?string $navigationIcon = 'heroicon-o-cog';
 
-    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    protected string $view = 'filament.clusters.settings';
+    protected static string $view = 'filament.clusters.settings';
 
     public static function canAccess(): bool
     {

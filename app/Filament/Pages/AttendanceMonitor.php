@@ -7,17 +7,17 @@ use App\Models\Course;
 use App\Models\Event;
 use App\Models\Period;
 use App\Models\Teacher;
-use BackedEnum;
 use Carbon\Carbon;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 
 class AttendanceMonitor extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     protected static ?int $navigationSort = 220;
 
-    protected string $view = 'filament.pages.attendance-monitor';
+    protected static string $view = 'filament.pages.attendance-monitor';
 
     public static function canAccess(): bool
     {
@@ -161,7 +161,7 @@ class AttendanceMonitor extends Page
         return __('Attendance Monitor');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Attendance Monitor');
     }

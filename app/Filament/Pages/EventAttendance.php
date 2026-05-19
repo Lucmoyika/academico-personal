@@ -5,10 +5,10 @@ namespace App\Filament\Pages;
 use App\Models\Attendance;
 use App\Models\AttendanceType;
 use App\Models\Event;
-use BackedEnum;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
 
 class EventAttendance extends Page
@@ -18,11 +18,11 @@ class EventAttendance extends Page
         return auth()->user()?->can('attendance.view') ?? false;
     }
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-hand-raised';
+    protected static ?string $navigationIcon = 'heroicon-o-hand-raised';
 
     protected static ?int $navigationSort = 3;
 
-    protected string $view = 'filament.pages.event-attendance';
+    protected static string $view = 'filament.pages.event-attendance';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -127,7 +127,7 @@ class EventAttendance extends Page
         return __('Event Attendance');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return $this->event
             ? __('Attendance').': '.($this->event->name ?? ($this->event->start ? Carbon::parse($this->event->start)->format('d/m/Y') : ''))

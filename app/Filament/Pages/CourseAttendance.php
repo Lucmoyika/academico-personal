@@ -6,10 +6,11 @@ use App\Models\Attendance;
 use App\Models\AttendanceType;
 use App\Models\Course;
 use App\Models\Enrollment;
-use BackedEnum;
+use App\Models\Event;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
 
 class CourseAttendance extends Page
@@ -19,11 +20,11 @@ class CourseAttendance extends Page
         return auth()->user()?->can('attendance.view') ?? false;
     }
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-table-cells';
+    protected static ?string $navigationIcon = 'heroicon-o-table-cells';
 
     protected static ?int $navigationSort = 2;
 
-    protected string $view = 'filament.pages.course-attendance';
+    protected static string $view = 'filament.pages.course-attendance';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -119,7 +120,7 @@ class CourseAttendance extends Page
 
     public function toggleAttendance(int $studentId, int $eventId, int $typeId): void
     {
-        $event = \App\Models\Event::find($eventId);
+        $event = Event::find($eventId);
         abort_unless($event && Gate::allows('edit-attendance', $event), 403);
 
         Attendance::updateOrCreate(
@@ -157,7 +158,7 @@ class CourseAttendance extends Page
         return __('Course Attendance');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return $this->courseName
             ? __('Attendance').': '.$this->courseName

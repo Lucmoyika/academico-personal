@@ -7,14 +7,14 @@ use App\Models\Enrollment;
 use App\Models\Grade;
 use App\Models\Result;
 use App\Models\ResultType;
-use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
 
 class GradeEdit extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-pencil-square';
+    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
 
     protected static ?int $navigationSort = 1;
 
@@ -30,7 +30,7 @@ class GradeEdit extends Page
         return false;
     }
 
-    protected string $view = 'filament.pages.grade-edit';
+    protected static string $view = 'filament.pages.grade-edit';
 
     public int $courseId;
 
@@ -307,7 +307,7 @@ class GradeEdit extends Page
         return __('Grades');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Grade Editing');
     }

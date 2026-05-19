@@ -15,7 +15,7 @@ class CourseBlockView extends Page
 {
     protected static string $resource = CourseResource::class;
 
-    protected string $view = 'filament.resources.courses.pages.course-block-view';
+    protected static string $view = 'filament.resources.courses.pages.course-block-view';
 
     public ?int $selectedPeriodId = null;
 

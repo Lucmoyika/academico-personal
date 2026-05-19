@@ -12,20 +12,18 @@ use App\Filament\Resources\Enrollments\RelationManagers\ScholarshipsRelationMana
 use App\Filament\Resources\Students\StudentResource;
 use App\Models\Enrollment;
 use App\Models\Period;
-use BackedEnum;
 use Carbon\Carbon;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ExportBulkAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
-use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\ExportAction;
+use Filament\Tables\Actions\ExportBulkAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
@@ -36,7 +34,7 @@ class EnrollmentResource extends Resource
 {
     protected static ?string $model = Enrollment::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     protected static ?int $navigationSort = 210;
 
@@ -60,10 +58,10 @@ class EnrollmentResource extends Resource
         return __('Enrollments');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return $schema
-            ->components([
+        return $infolist
+            ->schema([
                 Section::make(__('Enrollment Info'))
                     ->columns(2)
                     ->columnSpanFull()
@@ -212,14 +210,14 @@ class EnrollmentResource extends Resource
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
             ->defaultSort('id', 'desc')
-            ->recordActions([
+            ->actions([
                 ViewAction::make(),
             ])
             ->headerActions([
                 ExportAction::make()
                     ->exporter(EnrollmentExporter::class),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     ExportBulkAction::make()
                         ->exporter(EnrollmentExporter::class),

@@ -6,14 +6,15 @@ use App\Models\Config;
 use App\Models\Period;
 use App\Models\Year;
 use App\Services\StatService;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
+
 class InternalReport extends ReportPage
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 805;
 
-    protected string $view = 'filament.pages.internal-report';
+    protected static string $view = 'filament.pages.internal-report';
 
     public static function canAccess(): bool
     {
@@ -176,7 +177,7 @@ class InternalReport extends ReportPage
         return __('Internal Report');
     }
 
-    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('Internal Report');
     }

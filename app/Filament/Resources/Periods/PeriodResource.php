@@ -2,24 +2,23 @@
 
 namespace App\Filament\Resources\Periods;
 
+use App\Filament\Clusters\Settings\SettingsCluster;
 use App\Filament\Resources\Periods\Pages\ListPeriods;
 use App\Models\Config;
 use App\Models\Period;
-use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -29,7 +28,7 @@ class PeriodResource extends Resource
 {
     protected static ?string $model = Period::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendar;
+    protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     public static function canAccess(): bool
     {
@@ -51,9 +50,9 @@ class PeriodResource extends Resource
         return __('Periods');
     }
 
-    protected static ?string $cluster = \App\Filament\Clusters\Settings\SettingsCluster::class;
+    protected static ?string $cluster = SettingsCluster::class;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         return $schema
             ->components([
@@ -152,7 +151,7 @@ class PeriodResource extends Resource
                     ->label(__('Year'))
                     ->preload(),
             ])
-            ->recordActions([
+            ->actions([
                 Action::make('setAsCurrentPeriod')
                     ->label(__('Set as current'))
                     ->icon('heroicon-m-check-circle')
@@ -188,7 +187,7 @@ class PeriodResource extends Resource
                     DeleteAction::make(),
                 ]),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
