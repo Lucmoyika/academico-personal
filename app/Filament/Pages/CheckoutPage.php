@@ -19,8 +19,8 @@ use App\Models\ScheduledPayment;
 use App\Models\Tax;
 use App\Traits\ReportsErrors;
 use Carbon\Carbon;
-use Filament\Actions\Action;
 use Filament\Actions\Action as PageAction;
+use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
@@ -266,7 +266,7 @@ class CheckoutPage extends Page
                                         ->addActionLabel(__('Add Product'))
                                         ->reorderable(false)
                                         ->extraItemActions([
-                                            PageAction::make('addDiscount')
+                                            FormAction::make('addDiscount')
                                                 ->label(__('Add discount'))
                                                 ->icon('heroicon-o-receipt-percent')
                                                 ->form([
@@ -297,7 +297,7 @@ class CheckoutPage extends Page
 
                                                     $component->rawState($items);
                                                 }),
-                                            PageAction::make('addTax')
+                                            FormAction::make('addTax')
                                                 ->label(__('Add tax'))
                                                 ->icon('heroicon-o-calculator')
                                                 ->form([
@@ -732,13 +732,13 @@ class CheckoutPage extends Page
 
     public function accountingFailedAction(): Action
     {
-        return Action::make('accountingFailed')
+        return PageAction::make('accountingFailed')
             ->modalHeading(__('External accounting failed'))
             ->modalDescription(__('The invoice was created locally but could not be sent to the accounting system.'))
             ->closeModalByClickingAway(false)
             ->modalSubmitAction(false)
             ->extraModalFooterActions([
-                Action::make('keepLocalInvoice')
+                PageAction::make('keepLocalInvoice')
                     ->label(__('Keep local invoice'))
                     ->color('success')
                     ->action(function () {
@@ -754,7 +754,7 @@ class CheckoutPage extends Page
                             $this->redirect(InvoiceResource::getUrl('view', ['record' => $invoice]));
                         }
                     }),
-                Action::make('deleteAndRetry')
+                PageAction::make('deleteAndRetry')
                     ->label(__('Delete and retry later'))
                     ->color('danger')
                     ->action(function () {
@@ -787,7 +787,7 @@ class CheckoutPage extends Page
                         if ($this->enrollment) {
                             $this->redirect(EnrollmentResource::getUrl('view', ['record' => $this->enrollment]));
                         } else {
-                            $this->redirect(route('filament.admin.pages.checkout'));
+                            $this->redirect(static::getUrl());
                         }
                     }),
             ]);

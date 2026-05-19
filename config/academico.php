@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'company_name' => env('COMPANY_NAME', 'Academico'),
+    'company_name' => env('COMPANY_NAME', 'Lumo-Solution'),
     'company_address' => env('COMPANY_ADDRESS', ''),
     'company_phone' => env('COMPANY_PHONE', ''),
     'company_id' => env('COMPANY_ID', ''),
