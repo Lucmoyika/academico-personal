@@ -41,7 +41,7 @@ class SkillTypeResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 TextInput::make('shortname')
                     ->label(__('Abbreviation'))

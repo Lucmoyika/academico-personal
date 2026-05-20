@@ -49,7 +49,7 @@ class RoomResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Select::make('campus_id')
                     ->label(__('Campus'))

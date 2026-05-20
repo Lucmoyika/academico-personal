@@ -12,6 +12,7 @@ use App\Filament\Resources\Enrollments\RelationManagers\ScholarshipsRelationMana
 use App\Filament\Resources\Students\StudentResource;
 use App\Models\Enrollment;
 use App\Models\Period;
+use App\Models\User;
 use Carbon\Carbon;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\Section;
@@ -29,6 +30,7 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class EnrollmentResource extends Resource
 {
@@ -40,7 +42,10 @@ class EnrollmentResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('enrollments.view') ?? false;
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        return $user?->can('enrollments.view') ?? false;
     }
 
     public static function getNavigationGroup(): ?string
@@ -193,7 +198,7 @@ class EnrollmentResource extends Resource
                     ->preload(),
                 Filter::make('age')
                     ->label(__('Age'))
-                    ->schema([
+                    ->form([
                         TextInput::make('age')
                             ->label(__('Age'))
                             ->numeric()
@@ -241,5 +246,18 @@ class EnrollmentResource extends Resource
             'view' => ViewEnrollment::route('/{record}'),
             'change-course' => ChangeEnrollmentCourse::route('/{record}/change-course'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with([
+            'student.user:id,firstname,lastname,email',
+            'student.phone',
+            'course:id,name,period_id,teacher_id',
+            'course.period:id,name',
+            'course.teacher.user:id,firstname,lastname',
+            'enrollmentStatus:id,name,color',
+            'scholarships:id,name',
+        ]);
     }
 }

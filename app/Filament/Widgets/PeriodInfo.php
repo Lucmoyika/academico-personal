@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Filament\Resources\Periods\PeriodResource;
 use App\Models\Period;
 use Filament\Widgets\Widget;
+use Illuminate\Support\Facades\Cache;
 
 class PeriodInfo extends Widget
 {
@@ -16,13 +17,14 @@ class PeriodInfo extends Widget
 
     public function getData(): array
     {
-        $currentPeriod = Period::get_default_period();
-        $enrollmentsPeriod = Period::get_enrollments_period();
+        $periods = Cache::remember('widgets.period-info', 120, function (): array {
+            return [
+                'currentPeriod' => Period::get_default_period(),
+                'enrollmentsPeriod' => Period::get_enrollments_period(),
+            ];
+        });
 
-        return [
-            'currentPeriod' => $currentPeriod,
-            'enrollmentsPeriod' => $enrollmentsPeriod,
-        ];
+        return $periods;
     }
 
     public function getPeriodsUrl(): string

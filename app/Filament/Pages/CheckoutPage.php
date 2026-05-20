@@ -33,7 +33,9 @@ use Filament\Forms\Components\Wizard;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
@@ -55,7 +57,10 @@ class CheckoutPage extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('enrollments.edit') ?? false;
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        return $user?->can('enrollments.edit') ?? false;
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -77,6 +82,9 @@ class CheckoutPage extends Page
     {
         $products = [];
         $clientData = [];
+        $defaultFees = Cache::remember('checkout.default-fees', 300, fn () => Fee::where('default', 1)->get());
+        $defaultTaxes = Cache::remember('checkout.default-taxes', 300, fn () => Tax::where('default', true)->get());
+        $defaultInvoiceTypeId = Cache::remember('checkout.default-invoice-type', 300, fn () => InvoiceType::query()->value('id'));
 
         // Pre-populate from enrollment
         if ($enrollmentId = request('enrollment_id')) {
@@ -84,7 +92,7 @@ class CheckoutPage extends Page
 
             if ($this->enrollment) {
                 // Add default fees
-                foreach (Fee::where('default', 1)->get() as $fee) {
+                foreach ($defaultFees as $fee) {
                     $products[] = [
                         'product_name' => $fee->name,
                         'product_code' => $fee->product_code ?? '',
@@ -123,7 +131,7 @@ class CheckoutPage extends Page
                 }
 
                 // Add default taxes
-                foreach (Tax::where('default', true)->get() as $tax) {
+                foreach ($defaultTaxes as $tax) {
                     $enrollmentPrice = $this->enrollment->total_price ?? $this->enrollment->course->price ?? 0;
                     $taxAmount = round($enrollmentPrice * $tax->value / 100, 2);
                     $products[] = [
@@ -195,7 +203,7 @@ class CheckoutPage extends Page
             'client_phone' => $clientData['client_phone'] ?? '',
             'client_idnumber' => $clientData['client_idnumber'] ?? '',
             'client_address' => $clientData['client_address'] ?? '',
-            'invoice_type_id' => InvoiceType::first()?->id,
+            'invoice_type_id' => $defaultInvoiceTypeId,
             'date' => now()->format('Y-m-d'),
             'payments' => [['payment_method' => null, 'value' => $total, 'date' => now()->format('Y-m-d')]],
             'add_book' => null,
@@ -730,7 +738,7 @@ class CheckoutPage extends Page
         }
     }
 
-    public function accountingFailedAction(): Action
+    public function accountingFailedAction(): PageAction
     {
         return PageAction::make('accountingFailed')
             ->modalHeading(__('External accounting failed'))

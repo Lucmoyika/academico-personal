@@ -12,6 +12,7 @@ use App\Filament\Resources\Students\RelationManagers\ContactsRelationManager;
 use App\Filament\Resources\Students\RelationManagers\EnrollmentsRelationManager;
 use App\Models\Period;
 use App\Models\Student;
+use App\Models\User;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
@@ -46,11 +47,13 @@ class StudentResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('enrollments.view') ?? false;
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        return $user?->can('enrollments.view') ?? false;
     }
 
     protected static ?int $navigationSort = 200;
-
     public static function getNavigationGroup(): ?string
     {
         return __('Administration');
@@ -300,7 +303,7 @@ class StudentResource extends Resource
                     ->searchable(),
                 Filter::make('age')
                     ->label(__('Age'))
-                    ->schema([
+                    ->form([
                         TextInput::make('min_age')
                             ->label(__('Min Age'))
                             ->numeric()
@@ -384,5 +387,15 @@ class StudentResource extends Resource
             'edit' => EditStudent::route('/{record}/edit'),
             'enroll' => EnrollStudent::route('/{record}/enroll'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with([
+            'user:id,firstname,lastname,email,username',
+            'phone',
+            'institution:id,name',
+            'profession:id,name',
+        ]);
     }
 }

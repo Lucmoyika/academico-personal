@@ -12,6 +12,7 @@ use App\Filament\Resources\Courses\Pages\EditCourse;
 use App\Filament\Resources\Courses\Pages\ListCourses;
 use App\Models\Course;
 use App\Models\Period;
+use App\Models\User;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\DatePicker;
@@ -37,6 +38,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class CourseResource extends Resource
 {
@@ -48,7 +50,10 @@ class CourseResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('courses.view') ?? false;
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        return $user?->can('courses.view') ?? false;
     }
 
     public static function getModelLabel(): string
@@ -475,12 +480,12 @@ class CourseResource extends Resource
                         ->label(__('Evaluate Skills'))
                         ->icon('heroicon-o-star')
                         ->url(fn ($record) => SkillEvaluationPage::getUrl(['courseId' => $record->id]))
-                        ->visible(fn ($record) => $record->evaluationType?->skills()?->count() > 0 && $record->enrollments()->count() > 0),
+                        ->visible(fn ($record) => ($record->evaluationType?->skills?->isNotEmpty() ?? false) && ((int) $record->course_enrollments_count > 0)),
                     Action::make('manage_grades')
                         ->label(__('Manage Grades'))
                         ->icon('heroicon-o-pencil-square')
                         ->url(fn ($record) => GradeEdit::getUrl(['courseId' => $record->id]))
-                        ->visible(fn ($record) => $record->evaluationType?->gradeTypes()?->count() > 0 && $record->enrollments()->count() > 0),
+                        ->visible(fn ($record) => ($record->evaluationType?->gradeTypes?->isNotEmpty() ?? false) && ((int) $record->course_enrollments_count > 0)),
                     DeleteAction::make(),
                 ]),
             ])
@@ -495,6 +500,22 @@ class CourseResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'rhythm:id,name',
+                'level:id,name',
+                'teacher.user:id,firstname,lastname',
+                'room:id,name',
+                'period:id,name',
+                'children.times:id,course_id,day,start,end',
+                'evaluationType.skills:id,name',
+                'evaluationType.gradeTypes:id,name',
+            ])
+            ->withCount('enrollments');
     }
 
     public static function getPages(): array

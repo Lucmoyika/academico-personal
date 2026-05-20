@@ -4,9 +4,11 @@ namespace App\Filament\Pages;
 
 use App\Models\Period;
 use App\Models\Teacher;
+use App\Models\User;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Collection;
 
 class HrDashboard extends Page
 {
@@ -18,11 +20,13 @@ class HrDashboard extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('hr.view') ?? false;
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        return $user?->can('hr.view') ?? false;
     }
 
     public ?int $selectedPeriodId = null;
-
     public ?string $startDate = null;
 
     public ?string $endDate = null;
@@ -91,7 +95,23 @@ class HrDashboard extends Page
 
         $period = Period::find($this->selectedPeriodId);
 
-        $teachers = Teacher::with('user')
+        $teachers = Teacher::query()
+            ->with([
+                'user',
+                'events' => fn ($query) => $query
+                    ->where('start', '>=', Carbon::parse($this->startDate)->startOfDay()->toDateTimeString())
+                    ->where('end', '<=', Carbon::parse($this->endDate)->endOfDay()->toDateTimeString()),
+                'leaves' => fn ($query) => $query
+                    ->where('date', '>=', $this->startDate)
+                    ->where('date', '<=', $this->endDate),
+                'courses' => fn ($query) => $query
+                    ->realcourses()
+                    ->when(
+                        $period,
+                        fn ($courseQuery) => $courseQuery->where('period_id', $period->id),
+                    )
+                    ->whereDate('start_date', '<=', $this->endDate),
+            ])
             ->get()
             ->sortBy(fn ($t) => $t->user?->name);
 
@@ -99,21 +119,15 @@ class HrDashboard extends Page
 
         foreach ($teachers as $teacher) {
             // Theoretical volumes from course definitions (legacy "Heures prévues")
-            $theoreticalFaceToFace = $period
-                ? (float) $teacher->courses()->realcourses()->where('period_id', $period->id)->sum('volume')
-                : 0.0;
-            $theoreticalRemote = $period
-                ? (float) $teacher->courses()->realcourses()->where('period_id', $period->id)->sum('remote_volume')
-                : 0.0;
+            $teacherCourses = $teacher->courses;
+            $theoreticalFaceToFace = $period ? (float) $teacherCourses->sum('volume') : 0.0;
+            $theoreticalRemote = $period ? (float) $teacherCourses->sum('remote_volume') : 0.0;
 
             // Actual hours from scheduled events (legacy "Heures sur le calendrier")
-            $scheduledFaceToFace = $teacher->plannedHoursInPeriod($this->startDate, $this->endDate);
-            $scheduledRemote = $teacher->plannedRemoteHoursInPeriod($this->startDate, $this->endDate);
+            $scheduledFaceToFace = (float) $teacher->events->sum('length');
+            $scheduledRemote = $this->computeScheduledRemoteHours($teacherCourses, $this->startDate, $this->endDate);
 
-            $leaveDays = $teacher->leaves()
-                ->where('date', '>=', $this->startDate)
-                ->where('date', '<=', $this->endDate)
-                ->count();
+            $leaveDays = $teacher->leaves->count();
 
             $data[] = [
                 'teacherName' => $teacher->user?->name ?? __('Teacher').' #'.$teacher->id,
@@ -128,6 +142,27 @@ class HrDashboard extends Page
         }
 
         $this->teacherHours = $data;
+    }
+
+    protected function computeScheduledRemoteHours(Collection $courses, string $startDate, string $endDate): float
+    {
+        $total = 0.0;
+
+        foreach ($courses as $course) {
+            $totalCourseWeeks = (int) ($course->start_date->diffInDays($course->end_date) / 7) + 1;
+            $courseRemoteVolumePerWeek = $course->remote_volume / max(1, $totalCourseWeeks);
+
+            $effectiveStartDate = Carbon::parse($course->start_date)->max($startDate);
+
+            if ($effectiveStartDate <= $course->end_date) {
+                $effectiveEndDate = Carbon::parse($course->end_date)->min($endDate);
+                $numberOfWeeks = (int) ($effectiveStartDate->diffInDays($effectiveEndDate) / 7) + 1;
+
+                $total += $courseRemoteVolumePerWeek * $numberOfWeeks;
+            }
+        }
+
+        return $total;
     }
 
     public static function getNavigationGroup(): ?string

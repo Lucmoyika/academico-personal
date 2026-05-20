@@ -54,7 +54,7 @@ class PeriodResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Select::make('year_id')
                     ->label(__('Year'))

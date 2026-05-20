@@ -51,7 +51,7 @@ class LeaveResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Select::make('teacher_id')
                     ->label(__('Teacher'))

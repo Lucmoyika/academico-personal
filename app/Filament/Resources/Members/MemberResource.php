@@ -44,7 +44,7 @@ class MemberResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 TextInput::make('firstname')
                     ->label(__('First name'))

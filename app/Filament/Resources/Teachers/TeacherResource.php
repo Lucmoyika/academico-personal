@@ -6,6 +6,7 @@ use App\Filament\Resources\Teachers\Pages\CreateTeacher;
 use App\Filament\Resources\Teachers\Pages\EditTeacher;
 use App\Filament\Resources\Teachers\Pages\ListTeachers;
 use App\Models\Teacher;
+use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -33,7 +34,10 @@ class TeacherResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('hr.view') ?? false;
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        return $user?->can('hr.view') ?? false;
     }
 
     public static function getNavigationGroup(): ?string

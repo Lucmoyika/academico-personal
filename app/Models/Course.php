@@ -371,6 +371,10 @@ class Course extends Model
 
     public function getCourseEnrollmentsCountAttribute()
     {
+        if (array_key_exists('enrollments_count', $this->attributes)) {
+            return (int) $this->attributes['enrollments_count'];
+        }
+
         return $this->enrollments()->count();
     }
 
@@ -380,7 +384,7 @@ class Course extends Model
             return true;
         }
 
-        return $this->spots - $this->enrollments()->whereIn('status_id', Enrollment::ENROLLMENT_STATUSES_TO_COUNT_IN_STATS)->count() > 0;
+        return $this->spots - $this->course_enrollments_count > 0;
     }
 
     public function getTakesAttendanceAttribute(): bool

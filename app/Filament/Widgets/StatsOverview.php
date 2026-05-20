@@ -7,6 +7,7 @@ use App\Models\Period;
 use App\Services\StatService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class StatsOverview extends BaseWidget
 {
@@ -22,25 +23,39 @@ class StatsOverview extends BaseWidget
             return [];
         }
 
-        $stats = new StatService(external: false, partner: null, reference: $period);
+        $numbers = Cache::remember(
+            'widgets.stats-overview.'.$period->id,
+            120,
+            function () use ($period): array {
+                $stats = new StatService(external: false, partner: null, reference: $period);
+
+                return [
+                    'enrollments' => $stats->enrollmentsCount(),
+                    'paid' => $stats->paidEnrollmentsCount(),
+                    'pending' => $stats->pendingEnrollmentsCount(),
+                    'students' => $stats->studentsCount(),
+                    'new_students' => $stats->newStudentsCount(),
+                ];
+            }
+        );
 
         return [
-            Stat::make(__('Enrollments'), $stats->enrollmentsCount())
+            Stat::make(__('Enrollments'), $numbers['enrollments'])
                 ->description($period->name)
                 ->icon('heroicon-o-academic-cap')
                 ->color('primary'),
 
-            Stat::make(__('Paid Enrollments'), $stats->paidEnrollmentsCount())
-                ->description(__('Pending').': '.$stats->pendingEnrollmentsCount())
+            Stat::make(__('Paid Enrollments'), $numbers['paid'])
+                ->description(__('Pending').': '.$numbers['pending'])
                 ->icon('heroicon-o-credit-card')
                 ->color('success'),
 
-            Stat::make(__('Students'), $stats->studentsCount())
+            Stat::make(__('Students'), $numbers['students'])
                 ->description($period->name)
                 ->icon('heroicon-o-user-group')
                 ->color('info'),
 
-            Stat::make(__('New Students'), $stats->newStudentsCount())
+            Stat::make(__('New Students'), $numbers['new_students'])
                 ->description($period->name)
                 ->icon('heroicon-o-user-plus')
                 ->color('warning')

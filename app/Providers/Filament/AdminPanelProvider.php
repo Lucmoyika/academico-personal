@@ -30,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->spa()
             ->brandName('Lumo-Solution')
             ->login(Login::class)
             ->passwordReset()

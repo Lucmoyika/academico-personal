@@ -41,7 +41,7 @@ class GradeTypeCategoryResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 TextInput::make('name')
                     ->label(__('Label'))

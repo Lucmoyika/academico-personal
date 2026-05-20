@@ -46,7 +46,7 @@ class SkillResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->components([
                 Select::make('skill_type_id')
                     ->label(__('Type'))
